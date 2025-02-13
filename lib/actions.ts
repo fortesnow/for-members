@@ -4,22 +4,21 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 // 注: 実際のアプリケーションでは、これらの値は環境変数やデータベースで管理します
-const VALID_EMAIL = "test@example.com"
-const VALID_PASSWORD = "password"
+let SHARED_USERNAME = "admin"
+let SHARED_PASSWORD = "password123"
 
 // ログイン処理
 export async function login(formData: FormData) {
-  const email = formData.get("email") as string | null
-  const password = formData.get("password") as string | null
+  const username = formData.get("username")
+  const password = formData.get("password")
 
-  if (!email || !password) {
-    return { error: "メールアドレスとパスワードを入力してください" }
+  if (!username || !password) {
+    return { error: "ユーザーIDとパスワードを入力してください" }
   }
 
-  // ここで実際の認証処理を行う
-  if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+  if (username === SHARED_USERNAME && password === SHARED_PASSWORD) {
     const cookieStore = await cookies()
-    cookieStore.set("session", "authenticated", {
+    cookieStore.set("auth", "authenticated", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -28,15 +27,32 @@ export async function login(formData: FormData) {
     redirect("/dashboard?login=success")
   }
 
-  return { error: "メールアドレスまたはパスワードが正しくありません" }
+  return { error: "ユーザーIDまたはパスワードが正しくありません" }
 }
 
 // ログアウト処理
 export async function logout() {
   const cookieStore = await cookies()
-  cookieStore.delete("session")
+  cookieStore.delete("auth")
   redirect("/login")
 }
 
-// 認証情報の更新処理は削除（不要な場合）
+// 認証情報の更新処理
+export async function updateCredentials(formData: FormData) {
+  const newUsername = formData.get("newUsername")
+  const newPassword = formData.get("newPassword")
+  const confirmPassword = formData.get("confirmPassword")
+
+  if (!newUsername || !newPassword || !confirmPassword) {
+    return { error: "すべての項目を入力してください" }
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { error: "パスワードが一致しません" }
+  }
+
+  SHARED_USERNAME = newUsername.toString()
+  SHARED_PASSWORD = newPassword.toString()
+  return { success: true }
+}
 

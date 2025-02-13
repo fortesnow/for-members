@@ -26,19 +26,20 @@ export default async function MemberDetail(
   // const member = await fetchMember(id)
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">会員詳細</h1>
-        <Button asChild>
+    <div className="space-y-4 p-4 md:space-y-6 md:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold md:text-3xl">会員詳細</h1>
+        <Button className="w-full sm:w-auto" asChild>
           <Link href={`/members/${id}/edit`}>編集</Link>
         </Button>
       </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>山田 太郎</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">山田 太郎</CardTitle>
         </CardHeader>
         <CardContent>
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <dl className="grid gap-4 sm:grid-cols-2">
             <div>
               <dt className="font-medium text-gray-500">連絡先</dt>
               <dd>

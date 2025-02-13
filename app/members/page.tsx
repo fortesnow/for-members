@@ -49,22 +49,22 @@ export default function MemberList() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-primary">会員リスト</h1>
-        <Button className="rounded-full" asChild>
+    <div className="space-y-4 p-4 md:space-y-6 md:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-primary md:text-3xl">会員リスト</h1>
+        <Button className="w-full rounded-full sm:w-auto" asChild>
           <Link href="/members/new">
             <span className="px-2">＋ 新規会員登録</span>
           </Link>
         </Button>
       </div>
 
-      <div className="p-6 bg-white rounded-xl shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+      <div className="rounded-xl bg-white p-4 shadow-sm md:p-6">
+        <div className="grid gap-3 md:grid-cols-4 md:gap-4">
+          <div className="relative col-span-full md:col-span-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="pl-10 rounded-full"
+              className="pl-10"
               placeholder="名前やふりがなで検索..."
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
@@ -96,7 +96,7 @@ export default function MemberList() {
           </Button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="mt-4 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

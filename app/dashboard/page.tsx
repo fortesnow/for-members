@@ -26,19 +26,19 @@ function LoginNotification() {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 p-4 md:space-y-6 md:p-6">
       <Suspense>
         <LoginNotification />
       </Suspense>
-      <h1 className="text-3xl font-bold">ダッシュボード</h1>
-      <div className="grid gap-4 md:grid-cols-3">
+      <h1 className="text-2xl font-bold md:text-3xl">ダッシュボード</h1>
+      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">総会員数</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">123</div>
+            <div className="text-xl font-bold md:text-2xl">123</div>
           </CardContent>
         </Card>
 
@@ -69,12 +69,12 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+        <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle>資格種別内訳</CardTitle>
+            <CardTitle className="text-lg md:text-xl">資格種別内訳</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 md:px-6">
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">ベビーマッサージマスター</span>
