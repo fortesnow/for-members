@@ -1,56 +1,65 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { login } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { login } from "@/lib/actions"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [error, setError] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError("")
-
-    const formData = new FormData(event.currentTarget)
+  async function handleSubmit(formData: FormData) {
     const result = await login(formData)
-
-    if (result.error) {
+    
+    if (result?.error) {
       setError(result.error)
-    } else {
-      router.push("/")
-      router.refresh()
+      toast({
+        variant: "destructive",
+        title: "エラー",
+        description: result.error,
+      })
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold text-primary">会員管理システム</CardTitle>
-          <p className="text-sm text-muted-foreground">ログインしてください</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">ユーザーID</Label>
-              <Input id="username" name="username" type="text" required className="rounded-full" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">パスワード</Label>
-              <Input id="password" name="password" type="password" required className="rounded-full" />
-            </div>
-            {error && <p className="text-sm text-destructive text-center">{error}</p>}
-            <Button type="submit" className="w-full rounded-full">
-              ログイン
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex h-screen items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">ログイン</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            会員管理システムにログイン
+          </p>
+        </div>
+
+        <form action={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              type="email"
+              name="email"
+              placeholder="メールアドレス"
+              required
+              className="rounded-full"
+            />
+          </div>
+          <div className="space-y-2">
+            <Input
+              type="password"
+              name="password"
+              placeholder="パスワード"
+              required
+              className="rounded-full"
+            />
+          </div>
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
+          <Button type="submit" className="w-full rounded-full">
+            ログイン
+          </Button>
+        </form>
+      </div>
     </div>
   )
 }

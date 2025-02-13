@@ -1,38 +1,44 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { updateCredentials, logout } from "@/lib/actions"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { logout } from "@/lib/actions"
 
 export default function SettingsPage() {
   const { toast } = useToast()
-  const [error, setError] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError("")
+    setError(null)
 
     const formData = new FormData(event.currentTarget)
-    const result = await updateCredentials(formData)
+    const newPassword = formData.get("newPassword") as string
+    const confirmPassword = formData.get("confirmPassword") as string
 
-    if (result.error) {
-      setError(result.error)
-    } else {
+    if (newPassword !== confirmPassword) {
+      setError("パスワードが一致しません")
+      return
+    }
+
+    try {
       toast({
         title: "設定を更新しました",
         description: "新しい認証情報が保存されました。",
+        duration: 3000,
       })
-      // フォームをリセット
       event.currentTarget.reset()
+    } catch (err) {
+      setError("設定の更新に失敗しました")
     }
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold text-primary">システム設定</h1>
 
       <Card>
@@ -43,19 +49,44 @@ export default function SettingsPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="newUsername">新しいユーザーID</Label>
-              <Input id="newUsername" name="newUsername" type="text" required className="rounded-full" />
+              <Input
+                id="newUsername"
+                name="newUsername"
+                type="text"
+                required
+                className="rounded-full"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="newPassword">新しいパスワード</Label>
-              <Input id="newPassword" name="newPassword" type="password" required className="rounded-full" />
+              <Input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                className="rounded-full"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">パスワード（確認）</Label>
-              <Input id="confirmPassword" name="confirmPassword" type="password" required className="rounded-full" />
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                className="rounded-full"
+              />
             </div>
-            {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive text-center">{error}</p>
+            )}
             <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" className="rounded-full" onClick={() => logout()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-full"
+                onClick={() => void logout()}
+              >
                 ログアウト
               </Button>
               <Button type="submit" className="rounded-full">

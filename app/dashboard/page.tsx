@@ -1,7 +1,26 @@
+"use client"
+
+import { useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, UserPlus, UserCheck, MapPin, Award } from "lucide-react"
+import { Users, MapPin, Award } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const loginStatus = searchParams.get("login")
+    if (loginStatus === "success") {
+      toast({
+        title: "ログイン成功",
+        description: "ようこそ、会員管理システムへ",
+        duration: 3000,
+      })
+    }
+  }, [searchParams, toast])
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">ダッシュボード</h1>

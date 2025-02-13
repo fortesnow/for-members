@@ -1,21 +1,32 @@
 "use client"
 
-import dynamic from 'next/dynamic'
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 
-// PDFコンポーネントを動的にインポート
-const MemberPDF = dynamic(() => import('./MemberPDF'), {
-  ssr: false,
-  loading: () => <p>Loading...</p>
-})
+// Member型の定義
+type Member = {
+  id: number
+  name: string
+  furigana: string
+  type: string
+  phone: string
+  prefecture: string
+  number: string
+}
 
-export function PDFDownloadButton({ members }) {
+export function PDFDownloadButton({ members }: { members: Member[] }) {
+  const handleDownload = async () => {
+    try {
+      const { default: generatePDF } = await import('./MemberPDF')
+      await generatePDF(members)
+    } catch (error) {
+      console.error('PDF generation failed:', error)
+    }
+  }
+
   return (
     <Button 
-      onClick={() => {
-        // PDFダウンロードロジック
-      }}
+      onClick={handleDownload}
       className="flex items-center gap-2"
     >
       <Download className="h-4 w-4" />
