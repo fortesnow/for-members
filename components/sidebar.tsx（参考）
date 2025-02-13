@@ -1,0 +1,13 @@
+export function Sidebar() {
+  return (
+    <div>
+      <nav>
+        {/* サイドバーのナビゲーション */}
+      </nav>
+      <main>
+        {/* メインコンテンツ */}
+        <SeminarRegistrationComponent />
+      </main>
+    </div>
+  )
+} 
