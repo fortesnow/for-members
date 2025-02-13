@@ -33,50 +33,75 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4">
-      <div className="w-full max-w-[350px] space-y-6">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">会員管理システム</h1>
-          <p className="text-sm text-muted-foreground">
-            ログインしてください
-          </p>
+    <div className="grid min-h-screen place-items-center bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      <div className="w-full max-w-[380px] space-y-8 px-4">
+        <div className="space-y-4">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent sm:text-4xl">
+              会員管理システム
+            </h1>
+            <p className="text-sm text-gray-600 sm:text-base">
+              ✨ ログインしてはじめる ✨
+            </p>
+          </div>
         </div>
-        <Card className="border-none shadow-lg">
-          <CardContent className="pt-6">
-            <form action={handleSubmit} className="space-y-4">
+
+        <Card className="border-none shadow-lg backdrop-blur-sm bg-white/90">
+          <CardContent className="p-6 sm:p-8">
+            <form action={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username">ユーザーID</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  placeholder="admin"
-                  className="rounded-lg"
-                  disabled={isLoading}
-                  autoComplete="username"
-                />
+                <Label 
+                  htmlFor="username" 
+                  className="text-sm font-medium text-gray-700 sm:text-base"
+                >
+                  ユーザーID
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    placeholder="admin"
+                    className="h-12 pl-10 rounded-xl border-gray-200 bg-orange-50/50 text-base transition-colors focus:bg-white focus:border-orange-500"
+                    disabled={isLoading}
+                    autoComplete="username"
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    👤
+                  </span>
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">パスワード</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="rounded-lg"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                />
+                <Label 
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 sm:text-base"
+                >
+                  パスワード
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="h-12 pl-10 rounded-xl border-gray-200 bg-orange-50/50 text-base transition-colors focus:bg-white focus:border-orange-500"
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    🔒
+                  </span>
+                </div>
               </div>
               <Button 
                 type="submit" 
-                className="w-full rounded-lg"
+                className="h-12 w-full rounded-xl text-base font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 transition-all duration-300"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ログイン中...
                   </>
                 ) : (

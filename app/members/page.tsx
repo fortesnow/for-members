@@ -2,35 +2,26 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { PDFDownloadButton } from "@/components/PDFDownloadButton"
-
-// 仮のメンバーデータ
-const members = [
-  {
-    id: 1,
-    name: "小松 沙緒里",
-    furigana: "こまつ さおり",
-    type: "ベビーマッサージマスター",
-    phone: "090-1234-5678",
-    prefecture: "大阪府",
-    number: "19-00002",
-  },
-  {
-    id: 2,
-    name: "山田 花子",
-    furigana: "やまだ はなこ",
-    type: "ベビーヨガインストラクター",
-    phone: "080-9876-5432",
-    prefecture: "東京都",
-    number: "20-00001",
-  },
-  // 他のメンバーデータ...
-]
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { PDFDownloadButton } from "@/components/pdf-download-button"
+import { members } from "@/data/members"
 
 export default function MemberList() {
   const [filteredMembers, setFilteredMembers] = useState(members)
@@ -41,7 +32,9 @@ export default function MemberList() {
   const handleFilter = () => {
     const filtered = members.filter(
       (member) =>
-        (nameFilter === "" || member.name.includes(nameFilter) || member.furigana.includes(nameFilter)) &&
+        (nameFilter === "" || 
+         member.name.includes(nameFilter) || 
+         member.furigana.includes(nameFilter)) &&
         (typeFilter === "all" || member.type === typeFilter) &&
         (prefectureFilter === "all" || member.prefecture === prefectureFilter),
     )
@@ -71,7 +64,7 @@ export default function MemberList() {
             />
           </div>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="rounded-full">
+            <SelectTrigger>
               <SelectValue placeholder="資格種別で絞り込み" />
             </SelectTrigger>
             <SelectContent>
@@ -81,22 +74,62 @@ export default function MemberList() {
             </SelectContent>
           </Select>
           <Select value={prefectureFilter} onValueChange={setPrefectureFilter}>
-            <SelectTrigger className="rounded-full">
+            <SelectTrigger>
               <SelectValue placeholder="都道府県で絞り込み" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全て</SelectItem>
               <SelectItem value="大阪府">大阪府</SelectItem>
               <SelectItem value="東京都">東京都</SelectItem>
-              {/* 他の都道府県... */}
             </SelectContent>
           </Select>
-          <Button onClick={handleFilter} className="rounded-full">
+          <Button onClick={handleFilter}>
             絞り込み
           </Button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 space-y-4 md:hidden">
+          {filteredMembers.map((member) => (
+            <div
+              key={member.id}
+              className="rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{member.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {member.furigana}
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="rounded-full" asChild>
+                  <Link href={`/members/${member.id}`}>詳細</Link>
+                </Button>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">種別：</span>
+                  <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium">
+                    {member.type}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">電話：</span>
+                  {member.phone}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">地域：</span>
+                  {member.prefecture}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">番号：</span>
+                  {member.number}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 hidden md:block overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -113,7 +146,9 @@ export default function MemberList() {
                 <TableRow key={member.id}>
                   <TableCell>
                     <div>{member.name}</div>
-                    <div className="text-sm text-muted-foreground">{member.furigana}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {member.furigana}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-sm font-medium">
