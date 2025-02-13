@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 
 // 注: 実際のアプリケーションでは、これらの値は環境変数やデータベースで管理します
 let SHARED_USERNAME = "admin"
-let SHARED_PASSWORD = "password123"
+let SHARED_PASSWORD = "aoi1234"
 
 // ログイン処理
 export async function login(formData: FormData) {
@@ -24,7 +24,7 @@ export async function login(formData: FormData) {
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 1週間
     })
-    redirect("/dashboard?login=success")
+    redirect("/dashboard") // ログイン成功時はダッシュボードへ
   }
 
   return { error: "ユーザーIDまたはパスワードが正しくありません" }
