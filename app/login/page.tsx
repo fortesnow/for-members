@@ -1,20 +1,24 @@
 "use client"
 
-import { useState } from "react"
-import { login } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { login } from "@/lib/actions"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   async function handleSubmit(formData: FormData) {
     const result = await login(formData)
-    
-    if (result?.error) {
-      setError(result.error)
+    if (result.error) {
       toast({
         variant: "destructive",
         title: "エラー",
@@ -24,42 +28,41 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">ログイン</h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            会員管理システムにログイン
-          </p>
-        </div>
-
-        <form action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="email"
-              name="email"
-              placeholder="メールアドレス"
-              required
-              className="rounded-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <Input
-              type="password"
-              name="password"
-              placeholder="パスワード"
-              required
-              className="rounded-full"
-            />
-          </div>
-          {error && (
-            <p className="text-sm text-red-500">{error}</p>
-          )}
-          <Button type="submit" className="w-full rounded-full">
-            ログイン
-          </Button>
-        </form>
-      </div>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">ログイン</CardTitle>
+          <CardDescription>
+            会員管理システムにログインします
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">ユーザーID</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                required
+                placeholder="admin"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">パスワード</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              ログイン
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
