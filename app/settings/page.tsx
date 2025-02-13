@@ -38,7 +38,7 @@ export default function SettingsPage() {
         duration: 3000,
       })
       form.reset()
-    } catch (err) {
+    } catch {
       setError("設定の更新に失敗しました")
     }
   }
@@ -46,8 +46,8 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     try {
       await logout()
-    } catch (err) {
-      console.error("ログアウトに失敗しました:", err)
+    } catch {
+      console.error("ログアウトに失敗しました")
     }
   }
 
