@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, MapPin, Award } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
-function DashboardContent() {
+function LoginNotification() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
 
@@ -21,8 +21,15 @@ function DashboardContent() {
     }
   }, [searchParams, toast])
 
+  return null
+}
+
+export default function DashboardPage() {
   return (
     <div className="space-y-6">
+      <Suspense>
+        <LoginNotification />
+      </Suspense>
       <h1 className="text-3xl font-bold">ダッシュボード</h1>
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -104,13 +111,5 @@ function DashboardContent() {
         </Card>
       </div>
     </div>
-  )
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <DashboardContent />
-    </Suspense>
   )
 } 
