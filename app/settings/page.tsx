@@ -16,9 +16,15 @@ export default function SettingsPage() {
     event.preventDefault()
     setError(null)
 
-    const formData = new FormData(event.currentTarget)
-    const newPassword = formData.get("newPassword") as string
-    const confirmPassword = formData.get("confirmPassword") as string
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const newPassword = formData.get("newPassword") as string | null
+    const confirmPassword = formData.get("confirmPassword") as string | null
+
+    if (!newPassword || !confirmPassword) {
+      setError("すべての項目を入力してください")
+      return
+    }
 
     if (newPassword !== confirmPassword) {
       setError("パスワードが一致しません")
@@ -31,9 +37,17 @@ export default function SettingsPage() {
         description: "新しい認証情報が保存されました。",
         duration: 3000,
       })
-      event.currentTarget.reset()
+      form.reset()
     } catch (err) {
       setError("設定の更新に失敗しました")
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (err) {
+      console.error("ログアウトに失敗しました:", err)
     }
   }
 
@@ -85,7 +99,7 @@ export default function SettingsPage() {
                 type="button"
                 variant="outline"
                 className="rounded-full"
-                onClick={() => void logout()}
+                onClick={handleLogout}
               >
                 ログアウト
               </Button>

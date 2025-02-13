@@ -1,25 +1,22 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-
-// Next.jsの型定義をインポート
 import { Metadata } from "next"
 
-// メタデータの定義
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+interface PageProps {
+  params: {
+    id: string
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   return {
     title: `会員詳細 - ${params.id}`,
   }
 }
 
-// ページコンポーネントの型定義
-type Props = {
-  params: { id: string }
-}
-
-// ページコンポーネント
-export default function MemberDetail({ params }: Props) {
-  // 実際のアプリケーションでは、この ID を使用してデータベースから会員情報を取得します
+export default async function MemberDetail({ params }: PageProps) {
   const memberId = params.id
 
   return (

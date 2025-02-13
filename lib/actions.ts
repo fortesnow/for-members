@@ -9,8 +9,12 @@ const VALID_PASSWORD = "password"
 
 // ログイン処理
 export async function login(formData: FormData) {
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
+  const email = formData.get("email") as string | null
+  const password = formData.get("password") as string | null
+
+  if (!email || !password) {
+    return { error: "メールアドレスとパスワードを入力してください" }
+  }
 
   // ここで実際の認証処理を行う
   if (email === VALID_EMAIL && password === VALID_PASSWORD) {
