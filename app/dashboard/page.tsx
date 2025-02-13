@@ -1,18 +1,18 @@
 "use client"
 
 import { useEffect } from "react"
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, MapPin, Award } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
-export default function DashboardPage() {
-  const searchParams = useSearchParams()
+function DashboardContent() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const loginStatus = searchParams.get("login")
-    if (loginStatus === "success") {
+    if (searchParams.get("login") === "success") {
       toast({
         title: "ログイン成功",
         description: "ようこそ、会員管理システムへ",
@@ -104,5 +104,13 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   )
 } 

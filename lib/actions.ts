@@ -18,15 +18,13 @@ export async function login(formData: FormData) {
 
   // ここで実際の認証処理を行う
   if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-    cookies().set({
-      name: "session",
-      value: "authenticated",
+    const cookieStore = await cookies()
+    cookieStore.set("session", "authenticated", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7, // 1週間
     })
-
     redirect("/dashboard?login=success")
   }
 
@@ -35,7 +33,8 @@ export async function login(formData: FormData) {
 
 // ログアウト処理
 export async function logout() {
-  cookies().delete("session")
+  const cookieStore = await cookies()
+  cookieStore.delete("session")
   redirect("/login")
 }
 

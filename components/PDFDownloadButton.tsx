@@ -18,7 +18,7 @@ export function PDFDownloadButton({ members }: { members: Member[] }) {
   const handleDownload = async () => {
     try {
       const { default: generatePDF } = await import('./MemberPDF')
-      await generatePDF(members)
+      await generatePDF({ members })
     } catch (error) {
       console.error('PDF generation failed:', error)
     }

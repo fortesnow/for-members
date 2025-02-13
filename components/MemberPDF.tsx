@@ -2,6 +2,16 @@
 
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 
+type Member = {
+  id: number
+  name: string
+  furigana: string
+  type: string
+  phone: string
+  prefecture: string
+  number: string
+}
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -31,7 +41,7 @@ const styles = StyleSheet.create({
   }
 })
 
-const MemberPDF = ({ members }) => (
+const MemberPDF = ({ members }: { members: Member[] }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.title}>会員一覧</Text>
@@ -39,15 +49,17 @@ const MemberPDF = ({ members }) => (
         {/* テーブルヘッダー */}
         <View style={styles.tableRow}>
           <Text style={styles.tableCell}>氏名</Text>
-          <Text style={styles.tableCell}>メールアドレス</Text>
+          <Text style={styles.tableCell}>種別</Text>
           <Text style={styles.tableCell}>電話番号</Text>
+          <Text style={styles.tableCell}>都道府県</Text>
         </View>
         {/* メンバーデータ */}
         {members.map((member, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>{member.name}</Text>
-            <Text style={styles.tableCell}>{member.email}</Text>
+            <Text style={styles.tableCell}>{member.type}</Text>
             <Text style={styles.tableCell}>{member.phone}</Text>
+            <Text style={styles.tableCell}>{member.prefecture}</Text>
           </View>
         ))}
       </View>

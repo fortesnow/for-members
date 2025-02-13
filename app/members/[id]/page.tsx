@@ -3,28 +3,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Metadata } from "next"
 
-interface PageProps {
-  params: {
-    id: string
-  }
-  searchParams: { [key: string]: string | string[] | undefined }
+type PageParams = {
+  id: string
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<PageParams> }
+): Promise<Metadata> {
+  const resolvedParams = await params
   return {
-    title: `会員詳細 - ${params.id}`,
+    title: `会員詳細 - ${resolvedParams.id}`,
   }
 }
 
-export default async function MemberDetail({ params }: PageProps) {
-  const memberId = params.id
+export default async function MemberDetail(
+  { params }: { params: Promise<PageParams> }
+) {
+  const resolvedParams = await params
+  const { id } = resolvedParams
+
+  // ここでメンバー情報の非同期取得も可能
+  // const member = await fetchMember(id)
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">会員詳細</h1>
         <Button asChild>
-          <Link href={`/members/${memberId}/edit`}>編集</Link>
+          <Link href={`/members/${id}/edit`}>編集</Link>
         </Button>
       </div>
       <Card>
@@ -63,4 +69,3 @@ export default async function MemberDetail({ params }: PageProps) {
     </div>
   )
 }
-

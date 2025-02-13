@@ -17,39 +17,33 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
-type ToastActionType = 
-  | "ADD_TOAST"
-  | "UPDATE_TOAST"
-  | "DISMISS_TOAST"
-  | "REMOVE_TOAST"
+type State = {
+  toasts: ToasterToast[]
+}
+
+type Action =
+  | {
+      type: "ADD_TOAST"
+      toast: ToasterToast
+    }
+  | {
+      type: "UPDATE_TOAST"
+      toast: Partial<ToasterToast>
+    }
+  | {
+      type: "DISMISS_TOAST"
+      toastId?: string
+    }
+  | {
+      type: "REMOVE_TOAST"
+      toastId?: string
+    }
 
 let count = 0
 
 function genId() {
   count = (count + 1) % Number.MAX_VALUE
   return count.toString()
-}
-
-type Action =
-  | {
-      type: ToastActionType["ADD_TOAST"]
-      toast: ToasterToast
-    }
-  | {
-      type: ToastActionType["UPDATE_TOAST"]
-      toast: Partial<ToasterToast>
-    }
-  | {
-      type: ToastActionType["DISMISS_TOAST"]
-      toastId?: ToasterToast["id"]
-    }
-  | {
-      type: ToastActionType["REMOVE_TOAST"]
-      toastId?: ToasterToast["id"]
-    }
-
-interface State {
-  toasts: ToasterToast[]
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()

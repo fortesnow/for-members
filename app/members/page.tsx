@@ -77,8 +77,6 @@ export default function MemberList() {
             <SelectContent>
               <SelectItem value="all">全て</SelectItem>
               <SelectItem value="ベビーマッサージマスター">ベビーマッサージマスター</SelectItem>
-              <SelectItem value="ベビーヨガマスター">ベビーヨガマスター</SelectItem>
-              <SelectItem value="ベビーマッサージインストラクター">ベビーマッサージインストラクター</SelectItem>
               <SelectItem value="ベビーヨガインストラクター">ベビーヨガインストラクター</SelectItem>
             </SelectContent>
           </Select>
