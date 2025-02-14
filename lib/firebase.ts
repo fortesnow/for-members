@@ -37,6 +37,9 @@ if (typeof window !== 'undefined') {
     db = getFirestore(app)
     auth = getAuth(app)
 
+    console.log("Firebase Auth initialized:", !!auth) // デバッグ用
+    console.log("Current environment:", process.env.NODE_ENV) // デバッグ用
+
     // 開発環境の場合はエミュレーターを使用
     if (process.env.NODE_ENV === "development") {
       connectAuthEmulator(auth, "http://localhost:9099")

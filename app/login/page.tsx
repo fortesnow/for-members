@@ -20,47 +20,50 @@ export default function LoginPage() {
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
-      if (!auth) throw new Error("Firebase Auth is not initialized")
+      if (!auth) {
+        console.error("Firebase Auth is not initialized")
+        throw new Error("認証システムが初期化されていません")
+      }
 
-      // フォームから直接メールアドレスとパスワードを取得
       const email = formData.get("username") as string
       const password = formData.get("password") as string
 
+      console.log("Attempting login with:", email) // デバッグ用
+
       try {
-        // Firebaseで直接認証
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
-        const token = await userCredential.user.getIdToken()
+        console.log("Login successful:", userCredential.user.email) // デバッグ用
         
-        // セッションCookieを設定
-        await fetch("/api/auth/login", {
+        const token = await userCredential.user.getIdToken()
+        const response = await fetch("/api/auth/login", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ token }),
         })
-        
-        router.push("/dashboard")
-      } catch (error: unknown) {
-        if (error instanceof FirebaseError) {
-          console.error("Login error:", error)
-          
-          let errorMessage = "ログインに失敗しました"
-          if (error.code === 'auth/invalid-email') {
-            errorMessage = "メールアドレスの形式が正しくありません"
-          } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-            errorMessage = "メールアドレスまたはパスワードが間違っています"
-          }
 
-          toast({
-            variant: "destructive",
-            title: "エラー",
-            description: errorMessage,
-          })
+        if (!response.ok) {
+          throw new Error("セッションの作成に失敗しました")
         }
+
+        router.push("/dashboard")
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          console.error("Firebase login error:", error.code, error.message)
+          throw new Error(
+            error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found'
+              ? "メールアドレスまたはパスワードが間違っています"
+              : "ログインに失敗しました"
+          )
+        }
+        throw error
       }
-    } catch {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "エラー",
-        description: "ログインに失敗しました",
+        description: error instanceof Error ? error.message : "ログインに失敗しました",
       })
     } finally {
       setIsLoading(false)
