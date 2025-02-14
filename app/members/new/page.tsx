@@ -38,8 +38,8 @@ export default function NewMemberPage() {
           setPrefecture(address.address1)
           setCity(address.address2 + address.address3)
         }
-      } catch (error) {
-        console.error("郵便番号検索エラー:", error)
+      } catch {
+        console.error("郵便番号検索エラー")
       }
     }
   }
@@ -53,20 +53,19 @@ export default function NewMemberPage() {
     }
   }
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
       const member = {
-        name: formData.name,
-        furigana: formData.furigana,
-        type: formData.type,
-        phone: formData.phone,
+        name: formData.get("name") as string,
+        furigana: formData.get("furigana") as string,
+        type: formData.get("type") as string,
+        phone: formData.get("phone") as string,
         prefecture: prefecture,
         postalCode: postalCode,
         address: city,
         streetAddress: streetAddress,
-        number: formData.number,
+        number: formData.get("number") as string,
         email: "",
         notes: "",
       }
@@ -78,7 +77,7 @@ export default function NewMemberPage() {
       })
       router.push("/members")
       router.refresh()
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "エラー",
@@ -96,7 +95,7 @@ export default function NewMemberPage() {
           <CardTitle>新規会員登録</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={onSubmit} className="space-y-4">
+          <form action={handleSubmit} className="space-y-4">
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
