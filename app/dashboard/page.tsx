@@ -22,8 +22,7 @@ export default function DashboardPage() {
           phone: "090-1234-5678",
           prefecture: "大阪府",
           number: "23-0001",
-        },
-        // 必要に応じて追加のダミーデータ
+        }
       ])
       setIsLoading(false)
       return
