@@ -1,115 +1,119 @@
 "use client"
 
-import { useEffect } from "react"
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { getMembers } from "@/lib/db"
+import type { Member } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, MapPin, Award } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-
-function LoginNotification() {
-  const { toast } = useToast()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    if (searchParams.get("login") === "success") {
-      toast({
-        title: "ログイン成功",
-        description: "ようこそ、会員管理システムへ",
-        duration: 3000,
-      })
-    }
-  }, [searchParams, toast])
-
-  return null
-}
+import { Users, Award, MapPin } from "lucide-react"
 
 export default function DashboardPage() {
+  const [members, setMembers] = useState<Member[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadMembers() {
+      try {
+        const data = await getMembers()
+        setMembers(data)
+      } catch (error) {
+        console.error("Error loading members:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadMembers()
+  }, [])
+
+  // 資格種別ごとの会員数を集計
+  const qualificationCounts = members.reduce((acc, member) => {
+    acc[member.type] = (acc[member.type] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  // 地域ごとの会員数を集計
+  const regionCounts = members.reduce((acc, member) => {
+    acc[member.prefecture] = (acc[member.prefecture] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
   return (
-    <div className="space-y-4 p-4 md:space-y-6 md:p-6">
-      <Suspense>
-        <LoginNotification />
-      </Suspense>
-      <h1 className="text-2xl font-bold md:text-3xl">ダッシュボード</h1>
-      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">ダッシュボード</h1>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* 総会員数 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">総会員数</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold md:text-2xl">123</div>
+            <div className="text-2xl font-bold">{members.length}名</div>
           </CardContent>
         </Card>
 
+        {/* 資格種別の分布 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">資格保有者数</CardTitle>
+            <CardTitle className="text-sm font-medium">資格種別</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">45</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              ベビーマッサージマスター
-            </p>
+          <CardContent className="space-y-2">
+            {Object.entries(qualificationCounts).map(([type, count]) => (
+              <div key={type} className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{type}</span>
+                <span className="font-medium">{count}名</span>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
+        {/* 地域分布 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">地域別会員数</CardTitle>
+            <CardTitle className="text-sm font-medium">地域分布</CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">35</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              東京都
-            </p>
+          <CardContent className="space-y-2">
+            {Object.entries(regionCounts).map(([prefecture, count]) => (
+              <div key={prefecture} className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{prefecture}</span>
+                <span className="font-medium">{count}名</span>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 md:gap-4">
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-lg md:text-xl">資格種別内訳</CardTitle>
-          </CardHeader>
-          <CardContent className="px-2 md:px-6">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">ベビーマッサージマスター</span>
-                <span className="font-medium">45名</span>
+      {/* 最近の登録 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>最近の登録</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {members.slice(0, 5).map((member) => (
+              <div key={member.id} className="flex items-center justify-between border-b pb-2">
+                <div>
+                  <div className="font-medium">{member.name}</div>
+                  <div className="text-sm text-muted-foreground">{member.furigana}</div>
+                </div>
+                <div className="text-sm">
+                  <div>{member.type}</div>
+                  <div className="text-muted-foreground">{member.prefecture}</div>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">ベビーヨガインストラクター</span>
-                <span className="font-medium">78名</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>地域分布</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">東京都</span>
-                <span className="font-medium">35名</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">大阪府</span>
-                <span className="font-medium">28名</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">その他</span>
-                <span className="font-medium">60名</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {isLoading && (
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      )}
     </div>
   )
 } 

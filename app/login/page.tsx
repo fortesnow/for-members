@@ -1,24 +1,33 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { login } from "@/lib/actions"
 import { useToast } from "@/components/ui/use-toast"
-import { useState } from "react"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
 export default function LoginPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
+      // 開発環境ではサーバーアクションのみ呼び出し
+      if (process.env.NODE_ENV === "development") {
+        await login(formData)
+        router.push("/dashboard")
+        return
+      }
+
+      // 本番環境用の認証処理
       const result = await login(formData)
       if (result.error) {
         toast({
@@ -26,7 +35,27 @@ export default function LoginPage() {
           title: "エラー",
           description: result.error,
         })
+        return
       }
+
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        result.email as string,
+        result.password as string
+      )
+      
+      const token = await userCredential.user.getIdToken()
+      await fetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ token }),
+      })
+      router.push("/dashboard")
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "エラー",
+        description: "ログインに失敗しました",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -54,21 +83,21 @@ export default function LoginPage() {
                   htmlFor="username" 
                   className="text-sm font-medium text-gray-700 sm:text-base"
                 >
-                  ユーザーID
+                  メールアドレス
                 </Label>
                 <div className="relative">
                   <Input
                     id="username"
                     name="username"
-                    type="text"
+                    type="email"
                     required
-                    placeholder="admin"
+                    placeholder="admin@example.com"
                     className="h-12 pl-10 rounded-xl border-gray-200 bg-orange-50/50 text-base transition-colors focus:bg-white focus:border-orange-500"
                     disabled={isLoading}
-                    autoComplete="username"
+                    autoComplete="email"
                   />
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    👤
+                    📧
                   </span>
                 </div>
               </div>
