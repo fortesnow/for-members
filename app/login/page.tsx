@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import { FirebaseError } from 'firebase/app'
 
 export default function LoginPage() {
   const { toast } = useToast()
@@ -27,33 +28,40 @@ export default function LoginPage() {
         return
       }
 
-      // 本番環境用の認証処理
-      const result = await login(formData)
-      if (result.error) {
-        toast({
-          variant: "destructive",
-          title: "エラー",
-          description: result.error,
+      if (!auth) throw new Error("Firebase Auth is not initialized")
+
+      // フォームから直接メールアドレスとパスワードを取得
+      const email = formData.get("username") as string
+      const password = formData.get("password") as string
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password)
+        const token = await userCredential.user.getIdToken()
+        
+        await fetch("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ token }),
         })
-        return
-      }
+        
+        router.push("/dashboard")
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          console.error("Login error:", error)
+          
+          let errorMessage = "ログインに失敗しました"
+          if (error.code === 'auth/invalid-email') {
+            errorMessage = "メールアドレスの形式が正しくありません"
+          } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            errorMessage = "メールアドレスまたはパスワードが間違っています"
+          }
 
-      if (!auth) {
-        throw new Error("Firebase Auth is not initialized")
+          toast({
+            variant: "destructive",
+            title: "エラー",
+            description: errorMessage,
+          })
+        }
       }
-
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        result.email as string,
-        result.password as string
-      )
-      
-      const token = await userCredential.user.getIdToken()
-      await fetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ token }),
-      })
-      router.push("/dashboard")
     } catch {
       toast({
         variant: "destructive",
