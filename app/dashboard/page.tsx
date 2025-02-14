@@ -11,6 +11,25 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // 開発環境ではダミーデータを使用
+    if (process.env.NODE_ENV === "development") {
+      setMembers([
+        {
+          id: "1",
+          name: "テストユーザー1",
+          furigana: "てすとゆーざー1",
+          type: "ベビーマッサージマスター",
+          phone: "090-1234-5678",
+          prefecture: "大阪府",
+          number: "23-0001",
+        },
+        // 必要に応じて追加のダミーデータ
+      ])
+      setIsLoading(false)
+      return
+    }
+
+    // 本番環境では実際のデータを取得
     async function loadMembers() {
       try {
         const data = await getMembers()

@@ -38,6 +38,10 @@ export default function LoginPage() {
         return
       }
 
+      if (!auth) {
+        throw new Error("Firebase Auth is not initialized")
+      }
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
         result.email as string,

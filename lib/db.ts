@@ -30,6 +30,8 @@ export interface Member {
 
 // 会員一覧を取得
 export async function getMembers() {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const membersRef = collection(db, "members")
     const q = query(membersRef, orderBy("createdAt", "desc"))
@@ -46,6 +48,8 @@ export async function getMembers() {
 
 // 会員を追加
 export async function addMember(member: Omit<Member, "id" | "createdAt" | "updatedAt">) {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const membersRef = collection(db, "members")
     const now = Timestamp.now()
@@ -64,6 +68,8 @@ export async function addMember(member: Omit<Member, "id" | "createdAt" | "updat
 
 // 会員を更新
 export async function updateMember(id: string, member: Partial<Member>) {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const memberRef = doc(db, "members", id)
     const updates = {
@@ -79,6 +85,8 @@ export async function updateMember(id: string, member: Partial<Member>) {
 
 // 会員を削除
 export async function deleteMember(id: string) {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const memberRef = doc(db, "members", id)
     await deleteDoc(memberRef)
@@ -90,6 +98,8 @@ export async function deleteMember(id: string) {
 
 // 会員を検索
 export async function searchMembers(searchTerm: string) {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const membersRef = collection(db, "members")
     const q = query(
@@ -110,6 +120,8 @@ export async function searchMembers(searchTerm: string) {
 
 // 会員詳細を取得
 export async function getMember(id: string) {
+  if (!db) throw new Error("Firestore is not initialized")
+
   try {
     const memberRef = doc(db, "members", id)
     const snapshot = await getDoc(memberRef)
