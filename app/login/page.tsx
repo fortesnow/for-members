@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { login } from "@/lib/actions"
 import { useToast } from "@/components/ui/use-toast"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
@@ -21,13 +20,6 @@ export default function LoginPage() {
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
-      // 開発環境ではサーバーアクションのみ呼び出し
-      if (process.env.NODE_ENV === "development") {
-        await login(formData)
-        router.push("/dashboard")
-        return
-      }
-
       if (!auth) throw new Error("Firebase Auth is not initialized")
 
       // フォームから直接メールアドレスとパスワードを取得
@@ -35,9 +27,11 @@ export default function LoginPage() {
       const password = formData.get("password") as string
 
       try {
+        // Firebaseで直接認証
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
         const token = await userCredential.user.getIdToken()
         
+        // セッションCookieを設定
         await fetch("/api/auth/login", {
           method: "POST",
           body: JSON.stringify({ token }),
