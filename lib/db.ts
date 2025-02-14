@@ -23,6 +23,8 @@ export interface Member {
   number: string
   email?: string
   address?: string
+  postalCode?: string
+  streetAddress?: string
   notes?: string
   createdAt?: Timestamp
   updatedAt?: Timestamp
