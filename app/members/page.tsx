@@ -255,15 +255,27 @@ export default function MemberList() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">地域：</span>
-                      {member.prefecture}
+                      <div className="mt-1">
+                        <span className="inline-flex items-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium">
+                          {member.prefecture}
+                        </span>
+                      </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">住所：</span>
-                      {member.address}
+                      <div className="mt-1">
+                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                          {member.address || "未登録"}
+                        </span>
+                      </div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">番号：</span>
-                      {member.number}
+                      <span className="text-muted-foreground">認定証番号：</span>
+                      <div className="mt-1">
+                        <span className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">
+                          {member.number}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -279,7 +291,7 @@ export default function MemberList() {
                     <TableHead>電話番号</TableHead>
                     <TableHead>都道府県</TableHead>
                     <TableHead>住所</TableHead>
-                    <TableHead>番号</TableHead>
+                    <TableHead>認定証番号</TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -327,9 +339,21 @@ export default function MemberList() {
                           </a>
                         </div>
                       </TableCell>
-                      <TableCell>{member.prefecture}</TableCell>
-                      <TableCell>{member.address}</TableCell>
-                      <TableCell>{member.number}</TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium">
+                          {member.prefecture}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                          {member.address || "未登録"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">
+                          {member.number}
+                        </span>
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="sm" className="rounded-full" asChild>
                           <Link href={`/members/${member.id}`}>詳細</Link>

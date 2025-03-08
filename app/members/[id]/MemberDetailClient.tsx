@@ -59,6 +59,7 @@ type Member = {
   prefecture: string
   address?: string
   number: string
+  streetAddress?: string
 }
 
 // クライアントコンポーネント
@@ -230,16 +231,33 @@ export default function MemberDetailClient({ id }: { id: string }) {
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-gray-500">登録番号</dt>
-              <dd>{member.number}</dd>
+              <dt className="font-medium text-gray-500">認定証番号</dt>
+              <dd className="mt-2">
+                <span className="inline-flex items-center rounded-md bg-secondary px-3 py-1 text-sm font-medium">
+                  {member.number}
+                </span>
+              </dd>
             </div>
             <div>
               <dt className="font-medium text-gray-500">都道府県</dt>
-              <dd>{member.prefecture}</dd>
+              <dd className="mt-2">
+                <span className="inline-flex items-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium">
+                  {member.prefecture}
+                </span>
+              </dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="font-medium text-gray-500">住所</dt>
-              <dd>{member.address}</dd>
+              <dd className="mt-2">
+                <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
+                  {member.address || "未登録"}
+                </span>
+                {member.streetAddress && (
+                  <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium ml-2">
+                    {member.streetAddress}
+                  </span>
+                )}
+              </dd>
             </div>
           </dl>
         </CardContent>
