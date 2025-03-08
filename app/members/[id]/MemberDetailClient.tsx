@@ -233,7 +233,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-gray-500">認定証番号</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center rounded-md bg-secondary px-3 py-1 text-sm font-medium">
+                <span className="inline-flex items-center justify-center rounded-md bg-secondary px-3 py-1 text-sm font-medium min-w-[100px] text-center">
                   {member.number}
                 </span>
               </dd>
@@ -241,7 +241,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-gray-500">都道府県</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium">
+                <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium min-w-[100px] text-center">
                   {member.prefecture}
                 </span>
               </dd>

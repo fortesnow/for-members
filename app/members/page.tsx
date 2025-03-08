@@ -256,7 +256,7 @@ export default function MemberList() {
                     <div>
                       <span className="text-muted-foreground">地域：</span>
                       <div className="mt-1">
-                        <span className="inline-flex items-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium">
+                        <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.prefecture}
                         </span>
                       </div>
@@ -272,7 +272,7 @@ export default function MemberList() {
                     <div>
                       <span className="text-muted-foreground">認定証番号：</span>
                       <div className="mt-1">
-                        <span className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">
+                        <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.number}
                         </span>
                       </div>
@@ -340,7 +340,7 @@ export default function MemberList() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium">
+                        <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.prefecture}
                         </span>
                       </TableCell>
@@ -350,7 +350,7 @@ export default function MemberList() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">
+                        <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.number}
                         </span>
                       </TableCell>
