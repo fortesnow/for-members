@@ -1,46 +1,51 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getMembers } from "@/lib/db"
 import type { Member } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Award, MapPin } from "lucide-react"
+import { onSnapshot, collection, query, orderBy } from "firebase/firestore"
+import { db } from "@/lib/firebase"
 
 export default function DashboardPage() {
   const [members, setMembers] = useState<Member[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // 開発環境ではダミーデータを使用
-    if (process.env.NODE_ENV === "development") {
-      setMembers([
-        {
-          id: "1",
-          name: "テストユーザー1",
-          furigana: "てすとゆーざー1",
-          type: "ベビーマッサージマスター",
-          phone: "090-1234-5678",
-          prefecture: "大阪府",
-          number: "23-0001",
-        }
-      ])
+    // Firestoreからリアルタイムでデータを取得
+    if (!db) {
+      console.error("Firestore is not initialized")
       setIsLoading(false)
       return
     }
 
-    // 本番環境では実際のデータを取得
-    async function loadMembers() {
-      try {
-        const data = await getMembers()
-        setMembers(data)
-      } catch (error) {
-        console.error("Error loading members:", error)
-      } finally {
+    // クリーンアップ関数を準備
+    let unsubscribe: () => void = () => {}
+
+    try {
+      const membersRef = collection(db, "members")
+      const q = query(membersRef, orderBy("createdAt", "desc"))
+      
+      // リアルタイムリスナーをセットアップ
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const memberData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Member[]
+        
+        setMembers(memberData)
         setIsLoading(false)
-      }
+      }, (error) => {
+        console.error("Realtime data error:", error)
+        setIsLoading(false)
+      })
+    } catch (error) {
+      console.error("Error setting up realtime listener:", error)
+      setIsLoading(false)
     }
 
-    loadMembers()
+    // コンポーネントのアンマウント時にリスナーを解除
+    return () => unsubscribe()
   }, [])
 
   // 資格種別ごとの会員数を集計
@@ -84,6 +89,9 @@ export default function DashboardPage() {
                 <span className="font-medium">{count}名</span>
               </div>
             ))}
+            {Object.keys(qualificationCounts).length === 0 && (
+              <div className="text-sm text-muted-foreground">データがありません</div>
+            )}
           </CardContent>
         </Card>
 
@@ -100,6 +108,9 @@ export default function DashboardPage() {
                 <span className="font-medium">{count}名</span>
               </div>
             ))}
+            {Object.keys(regionCounts).length === 0 && (
+              <div className="text-sm text-muted-foreground">データがありません</div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -123,6 +134,9 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
+            {members.length === 0 && (
+              <div className="text-sm text-muted-foreground">最近の登録がありません</div>
+            )}
           </div>
         </CardContent>
       </Card>

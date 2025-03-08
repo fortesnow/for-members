@@ -17,7 +17,8 @@ export interface Member {
   id?: string
   name: string
   furigana: string
-  type: string
+  type?: string
+  types?: string[]
   phone: string
   prefecture: string
   number: string

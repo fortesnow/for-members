@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
@@ -23,6 +22,7 @@ export default function NewMemberPage() {
     name: "",
     furigana: "",
     type: "",
+    types: [] as string[],
     phone: "",
     number: "",
   })
@@ -56,10 +56,15 @@ export default function NewMemberPage() {
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     try {
+      // フォームからチェックボックスの値を取得
+      const selectedTypes = Array.from(formData.getAll("types")) as string[];
+      
       const member = {
         name: formData.get("name") as string,
         furigana: formData.get("furigana") as string,
-        type: formData.get("type") as string,
+        types: selectedTypes,
+        // 後方互換性のために最初の選択を単一のtypeフィールドにも設定
+        type: selectedTypes.length > 0 ? selectedTypes[0] : "",
         phone: formData.get("phone") as string,
         prefecture: prefecture,
         postalCode: postalCode,
@@ -129,23 +134,102 @@ export default function NewMemberPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="type" className="text-sm font-medium">
-                  資格種別
+                <Label className="text-sm font-medium">
+                  資格種別（複数選択可）
                 </Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value })}
-                >
-                  <SelectTrigger id="type" className="rounded-full">
-                    <SelectValue placeholder="資格を選択してください" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ベビーマッサージマスター">ベビーマッサージマスター</SelectItem>
-                    <SelectItem value="ベビーヨガマスター">ベビーヨガマスター</SelectItem>
-                    <SelectItem value="ベビーマッサージインストラクター">ベビーマッサージインストラクター</SelectItem>
-                    <SelectItem value="ベビーヨガインストラクター">ベビーヨガインストラクター</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 border rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id="type-master-massage"
+                      name="types"
+                      value="ベビーマッサージマスター"
+                      className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      checked={formData.types.includes("ベビーマッサージマスター")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => {
+                          const types = e.target.checked 
+                            ? [...prev.types, value] 
+                            : prev.types.filter(t => t !== value);
+                          return { ...prev, types };
+                        });
+                      }}
+                    />
+                    <Label htmlFor="type-master-massage" className="text-sm">
+                      ベビーマッサージマスター
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id="type-master-yoga"
+                      name="types"
+                      value="ベビーヨガマスター"
+                      className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      checked={formData.types.includes("ベビーヨガマスター")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => {
+                          const types = e.target.checked 
+                            ? [...prev.types, value] 
+                            : prev.types.filter(t => t !== value);
+                          return { ...prev, types };
+                        });
+                      }}
+                    />
+                    <Label htmlFor="type-master-yoga" className="text-sm">
+                      ベビーヨガマスター
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id="type-instructor-massage"
+                      name="types"
+                      value="ベビーマッサージインストラクター"
+                      className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      checked={formData.types.includes("ベビーマッサージインストラクター")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => {
+                          const types = e.target.checked 
+                            ? [...prev.types, value] 
+                            : prev.types.filter(t => t !== value);
+                          return { ...prev, types };
+                        });
+                      }}
+                    />
+                    <Label htmlFor="type-instructor-massage" className="text-sm">
+                      ベビーマッサージインストラクター
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="type-instructor-yoga"
+                      name="types"
+                      value="ベビーヨガインストラクター"
+                      className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      checked={formData.types.includes("ベビーヨガインストラクター")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => {
+                          const types = e.target.checked 
+                            ? [...prev.types, value] 
+                            : prev.types.filter(t => t !== value);
+                          return { ...prev, types };
+                        });
+                      }}
+                    />
+                    <Label htmlFor="type-instructor-yoga" className="text-sm">
+                      ベビーヨガインストラクター
+                    </Label>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

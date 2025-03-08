@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, Loader2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -21,25 +21,74 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { PDFDownloadButton } from "@/components/pdf-download-button"
-import { members } from "@/data/members"
+import { db } from "@/lib/firebase"
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
+import type { Member } from "@/lib/db"
 
 export default function MemberList() {
-  const [filteredMembers, setFilteredMembers] = useState(members)
+  const [members, setMembers] = useState<Member[]>([])
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [nameFilter, setNameFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [prefectureFilter, setPrefectureFilter] = useState("all")
+
+  // Firestoreからリアルタイムでデータを取得
+  useEffect(() => {
+    if (!db) {
+      console.error("Firestore is not initialized")
+      setIsLoading(false)
+      return
+    }
+
+    // クリーンアップ関数を準備
+    let unsubscribe: () => void = () => {}
+
+    try {
+      const membersRef = collection(db, "members")
+      const q = query(membersRef, orderBy("createdAt", "desc"))
+      
+      // リアルタイムリスナーをセットアップ
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const memberData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Member[]
+        
+        setMembers(memberData)
+        setFilteredMembers(memberData)
+        setIsLoading(false)
+      }, (error) => {
+        console.error("Realtime data error:", error)
+        setIsLoading(false)
+      })
+    } catch (error) {
+      console.error("Error setting up realtime listener:", error)
+      setIsLoading(false)
+    }
+
+    // コンポーネントのアンマウント時にリスナーを解除
+    return () => unsubscribe()
+  }, [])
 
   const handleFilter = () => {
     const filtered = members.filter(
       (member) =>
         (nameFilter === "" || 
-         member.name.includes(nameFilter) || 
-         member.furigana.includes(nameFilter)) &&
-        (typeFilter === "all" || member.type === typeFilter) &&
+         member.name?.includes(nameFilter) || 
+         member.furigana?.includes(nameFilter)) &&
+        (typeFilter === "all" || 
+         // typesフィールドがある場合はそれを使用、なければtypeフィールドをチェック
+         (member.types?.includes(typeFilter) || member.type === typeFilter)) &&
         (prefectureFilter === "all" || member.prefecture === prefectureFilter),
     )
     setFilteredMembers(filtered)
   }
+
+  // フィルター条件が変更されたら自動的にフィルタリングを実行
+  useEffect(() => {
+    handleFilter()
+  }, [nameFilter, typeFilter, prefectureFilter, members])
 
   return (
     <div className="space-y-4 p-4 md:space-y-6 md:p-6">
@@ -53,125 +102,196 @@ export default function MemberList() {
       </div>
 
       <div className="rounded-xl bg-white p-4 shadow-sm md:p-6">
-        <div className="grid gap-3 md:grid-cols-4 md:gap-4">
-          <div className="relative col-span-full md:col-span-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="pl-10"
-              placeholder="名前やふりがなで検索..."
-              value={nameFilter}
-              onChange={(e) => setNameFilter(e.target.value)}
-            />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="資格種別で絞り込み" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全て</SelectItem>
-              <SelectItem value="ベビーマッサージマスター">ベビーマッサージマスター</SelectItem>
-              <SelectItem value="ベビーヨガインストラクター">ベビーヨガインストラクター</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={prefectureFilter} onValueChange={setPrefectureFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="都道府県で絞り込み" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全て</SelectItem>
-              <SelectItem value="大阪府">大阪府</SelectItem>
-              <SelectItem value="東京都">東京都</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={handleFilter}>
-            絞り込み
-          </Button>
-        </div>
-
-        <div className="mt-4 space-y-4 md:hidden">
-          {filteredMembers.map((member) => (
-            <div
-              key={member.id}
-              className="rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{member.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {member.furigana}
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" className="rounded-full" asChild>
-                  <Link href={`/members/${member.id}`}>詳細</Link>
+        ) : (
+          <>
+            <div className="grid gap-3 md:grid-cols-4 md:gap-4">
+              <div className="relative col-span-full md:col-span-1">
+                <div className="text-sm font-medium text-gray-700 mb-1">名前・ふりがな検索</div>
+                <Search className="absolute left-3 top-[calc(50%+0.5rem)] h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  className="pl-10"
+                  placeholder="名前やふりがなで検索..."
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
+                />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-1">資格種別</div>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="資格種別で絞り込み" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全ての資格種別</SelectItem>
+                    <SelectItem value="ベビーマッサージマスター">ベビーマッサージマスター</SelectItem>
+                    <SelectItem value="ベビーヨガマスター">ベビーヨガマスター</SelectItem>
+                    <SelectItem value="ベビーマッサージインストラクター">ベビーマッサージインストラクター</SelectItem>
+                    <SelectItem value="ベビーヨガインストラクター">ベビーヨガインストラクター</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-1">都道府県</div>
+                <Select value={prefectureFilter} onValueChange={setPrefectureFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="都道府県で絞り込み" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全ての都道府県</SelectItem>
+                    <SelectItem value="大阪府">大阪府</SelectItem>
+                    <SelectItem value="東京都">東京都</SelectItem>
+                    <SelectItem value="京都府">京都府</SelectItem>
+                    <SelectItem value="北海道">北海道</SelectItem>
+                    <SelectItem value="福岡県">福岡県</SelectItem>
+                    <SelectItem value="愛知県">愛知県</SelectItem>
+                    <SelectItem value="神奈川県">神奈川県</SelectItem>
+                    <SelectItem value="兵庫県">兵庫県</SelectItem>
+                    <SelectItem value="宮城県">宮城県</SelectItem>
+                    <SelectItem value="広島県">広島県</SelectItem>
+                    <SelectItem value="沖縄県">沖縄県</SelectItem>
+                    <SelectItem value="静岡県">静岡県</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-1">操作</div>
+                <Button onClick={handleFilter} className="w-full">
+                  絞り込み
                 </Button>
               </div>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">種別：</span>
-                  <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium">
-                    {member.type}
+            </div>
+
+            <div className="mt-4 mb-2 text-sm">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-gray-500">現在の絞り込み：</span>
+                {nameFilter && (
+                  <span className="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
+                    名前/ふりがな: {nameFilter}
                   </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">電話：</span>
-                  {member.phone}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">地域：</span>
-                  {member.prefecture}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">番号：</span>
-                  {member.number}
-                </div>
+                )}
+                {typeFilter !== 'all' && (
+                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                    種別: {typeFilter}
+                  </span>
+                )}
+                {prefectureFilter !== 'all' && (
+                  <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                    地域: {prefectureFilter}
+                  </span>
+                )}
+                {!nameFilter && typeFilter === 'all' && prefectureFilter === 'all' && (
+                  <span className="text-gray-500">すべての会員を表示中</span>
+                )}
+                <span className="text-gray-500 ml-auto">
+                  検索結果: {filteredMembers.length}件
+                </span>
               </div>
             </div>
-          ))}
-        </div>
 
-        <div className="mt-4 hidden md:block overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">名前 / ふりがな</TableHead>
-                <TableHead>種別</TableHead>
-                <TableHead>電話番号</TableHead>
-                <TableHead>都道府県</TableHead>
-                <TableHead>番号</TableHead>
-                <TableHead className="text-right">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <div className="mt-4 space-y-4 md:hidden">
               {filteredMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>
-                    <div>{member.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {member.furigana}
+                <div
+                  key={member.id}
+                  className="rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{member.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {member.furigana}
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-sm font-medium">
-                      {member.type}
-                    </span>
-                  </TableCell>
-                  <TableCell>{member.phone}</TableCell>
-                  <TableCell>{member.prefecture}</TableCell>
-                  <TableCell>{member.number}</TableCell>
-                  <TableCell className="text-right">
                     <Button variant="ghost" size="sm" className="rounded-full" asChild>
                       <Link href={`/members/${member.id}`}>詳細</Link>
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">種別：</span>
+                      <div>
+                        <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium">
+                          {member.types?.length 
+                            ? member.types.join(", ") 
+                            : member.type}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">電話：</span>
+                      {member.phone}
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">地域：</span>
+                      {member.prefecture}
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">住所：</span>
+                      {member.address}
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">番号：</span>
+                      {member.number}
+                    </div>
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
-        </div>
+            </div>
 
-        <div className="flex justify-end mt-4">
-          <PDFDownloadButton members={filteredMembers} />
-        </div>
+            <div className="mt-4 hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[200px]">名前 / ふりがな</TableHead>
+                    <TableHead>種別</TableHead>
+                    <TableHead>電話番号</TableHead>
+                    <TableHead>都道府県</TableHead>
+                    <TableHead>住所</TableHead>
+                    <TableHead>番号</TableHead>
+                    <TableHead className="text-right">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMembers.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell>
+                        <div>{member.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {member.furigana}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-sm font-medium">
+                            {member.types?.length 
+                              ? member.types.join(", ") 
+                              : member.type}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{member.phone}</TableCell>
+                      <TableCell>{member.prefecture}</TableCell>
+                      <TableCell>{member.address}</TableCell>
+                      <TableCell>{member.number}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" className="rounded-full" asChild>
+                          <Link href={`/members/${member.id}`}>詳細</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <PDFDownloadButton members={filteredMembers} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
