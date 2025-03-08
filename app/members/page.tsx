@@ -217,16 +217,41 @@ export default function MemberList() {
                     <div>
                       <span className="text-muted-foreground">種別：</span>
                       <div>
-                        <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium">
+                        <span className="text-muted-foreground">種別：</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
                           {member.types?.length 
-                            ? member.types.join(", ") 
-                            : member.type}
-                        </span>
+                            ? member.types.map((type) => (
+                                <span
+                                  key={type}
+                                  className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium"
+                                >
+                                  {type}
+                                </span>
+                              ))
+                            : (
+                                <span className="inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-xs font-medium">
+                                  {member.type}
+                                </span>
+                              )
+                          }
+                        </div>
                       </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">電話：</span>
-                      {member.phone}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium">
+                          {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
+                        </span>
+                        <a 
+                          href={`tel:${member.phone}`} 
+                          className="text-primary hover:text-primary/80 inline-flex items-center text-xs"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </a>
+                      </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">地域：</span>
@@ -268,15 +293,40 @@ export default function MemberList() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div>
-                          <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-sm font-medium">
-                            {member.types?.length 
-                              ? member.types.join(", ") 
-                              : member.type}
-                          </span>
+                        <div className="flex flex-wrap gap-1">
+                          {member.types?.length 
+                            ? member.types.map((type) => (
+                                <span
+                                  key={type}
+                                  className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium"
+                                >
+                                  {type}
+                                </span>
+                              ))
+                            : (
+                                <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium">
+                                  {member.type}
+                                </span>
+                              )
+                          }
                         </div>
                       </TableCell>
-                      <TableCell>{member.phone}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium">
+                            {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
+                          </span>
+                          <a 
+                            href={`tel:${member.phone}`} 
+                            className="text-primary hover:text-primary/80"
+                            title="発信"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                          </a>
+                        </div>
+                      </TableCell>
                       <TableCell>{member.prefecture}</TableCell>
                       <TableCell>{member.address}</TableCell>
                       <TableCell>{member.number}</TableCell>
