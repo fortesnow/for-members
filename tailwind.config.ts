@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
   	extend: {
+      fontFamily: {
+        sans: ['Hiragino Maru Gothic ProN', 'Meiryo', 'Rounded Mplus 1c', 'M PLUS Rounded 1c', 'Quicksand', 'Arial Rounded MT Bold', 'sans-serif'],
+      },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import type { Member } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Award, MapPin } from "lucide-react"
+import { Users, Award, MapPin, Clock } from "lucide-react"
 import { onSnapshot, collection, query, orderBy } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
@@ -68,89 +68,125 @@ export default function DashboardPage() {
   }, {} as Record<string, number>)
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">ダッシュボード</h1>
+    <div className="space-y-8 px-1 py-4 md:px-4 md:py-6">
+      <header className="border-b border-accent pb-4 mb-6">
+        <h1 className="text-3xl">会員管理ダッシュボード</h1>
+        <p className="text-muted-foreground mt-3">現在の会員情報と分布を確認できます</p>
+      </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
         {/* 総会員数 */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="overflow-hidden border-accent/40 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-accent/20">
             <CardTitle className="text-sm font-medium">総会員数</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-5 w-5 text-primary/80" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{members.length}名</div>
+          <CardContent className="pt-6">
+            <div className="text-3xl font-serif font-medium">{members.length}<span className="text-lg ml-1">名</span></div>
+            <p className="text-xs text-muted-foreground mt-2">登録されているすべての会員</p>
           </CardContent>
         </Card>
 
         {/* 資格種別の分布 */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="overflow-hidden border-accent/40 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-accent/20">
             <CardTitle className="text-sm font-medium">資格種別</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
+            <Award className="h-5 w-5 text-primary/80" />
           </CardHeader>
-          <CardContent className="space-y-2">
-            {Object.entries(qualificationCounts).map(([type, count]) => (
-              <div key={type} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{type}</span>
-                <span className="font-medium">{count}名</span>
-              </div>
-            ))}
-            {Object.keys(qualificationCounts).length === 0 && (
-              <div className="text-sm text-muted-foreground">データがありません</div>
-            )}
+          <CardContent className="pt-4">
+            <div className="space-y-3">
+              {Object.entries(qualificationCounts).map(([type, count]) => (
+                <div key={type} className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">{type}</span>
+                  <div className="flex items-center">
+                    <div className="w-16 h-1.5 bg-secondary rounded-full overflow-hidden mr-3">
+                      <div 
+                        className="h-full bg-primary/70 rounded-full" 
+                        style={{ 
+                          width: `${Math.min(100, (count / members.length) * 100)}%` 
+                        }}
+                      />
+                    </div>
+                    <span className="font-serif">{count}<span className="text-xs ml-0.5">名</span></span>
+                  </div>
+                </div>
+              ))}
+              {Object.keys(qualificationCounts).length === 0 && (
+                <div className="text-sm text-muted-foreground italic">データがありません</div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         {/* 地域分布 */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="overflow-hidden border-accent/40 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-accent/20">
             <CardTitle className="text-sm font-medium">地域分布</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <MapPin className="h-5 w-5 text-primary/80" />
           </CardHeader>
-          <CardContent className="space-y-2">
-            {Object.entries(regionCounts).map(([prefecture, count]) => (
-              <div key={prefecture} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{prefecture}</span>
-                <span className="font-medium">{count}名</span>
-              </div>
-            ))}
-            {Object.keys(regionCounts).length === 0 && (
-              <div className="text-sm text-muted-foreground">データがありません</div>
-            )}
+          <CardContent className="pt-4">
+            <div className="space-y-3">
+              {Object.entries(regionCounts).map(([prefecture, count]) => (
+                <div key={prefecture} className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">{prefecture}</span>
+                  <div className="flex items-center">
+                    <div className="w-16 h-1.5 bg-secondary rounded-full overflow-hidden mr-3">
+                      <div 
+                        className="h-full bg-primary/70 rounded-full" 
+                        style={{ 
+                          width: `${Math.min(100, (count / members.length) * 100)}%` 
+                        }}
+                      />
+                    </div>
+                    <span className="font-serif">{count}<span className="text-xs ml-0.5">名</span></span>
+                  </div>
+                </div>
+              ))}
+              {Object.keys(regionCounts).length === 0 && (
+                <div className="text-sm text-muted-foreground italic">データがありません</div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* 最近の登録 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>最近の登録</CardTitle>
+      <Card className="border-accent/40 shadow-sm overflow-hidden">
+        <CardHeader className="bg-accent/20">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-primary text-lg">最近の登録</CardTitle>
+            <Clock className="h-5 w-5 text-primary/80" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="pt-6">
+          <div className="space-y-5">
             {members.slice(0, 5).map((member) => (
-              <div key={member.id} className="flex items-center justify-between border-b pb-2">
+              <div key={member.id} className="flex items-center justify-between border-b border-accent/30 pb-4">
                 <div>
                   <div className="font-medium">{member.name}</div>
-                  <div className="text-sm text-muted-foreground">{member.furigana}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{member.furigana}</div>
                 </div>
-                <div className="text-sm">
-                  <div>{member.type}</div>
-                  <div className="text-muted-foreground">{member.prefecture}</div>
+                <div className="text-right">
+                  <div className="text-sm font-medium">{member.type || member.types?.join(', ')}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 flex items-center">
+                    <MapPin className="h-3 w-3 mr-1 inline-block" /> 
+                    {member.prefecture}
+                  </div>
                 </div>
               </div>
             ))}
             {members.length === 0 && (
-              <div className="text-sm text-muted-foreground">最近の登録がありません</div>
+              <div className="text-sm text-muted-foreground italic text-center py-8">
+                最近の登録がありません
+              </div>
             )}
           </div>
         </CardContent>
       </Card>
 
       {isLoading && (
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
         </div>
       )}
     </div>
