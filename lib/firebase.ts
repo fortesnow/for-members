@@ -22,7 +22,8 @@ if (typeof window !== 'undefined') {
     db = getFirestore(app)
     auth = getAuth(app)
 
-    if (process.env.NODE_ENV === "development") {
+    // エミュレータ接続を一時的に無効化
+    if (process.env.NODE_ENV === "development" && process.env.USE_EMULATOR === "true") {
       connectAuthEmulator(auth, "http://localhost:9099")
       connectFirestoreEmulator(db, 'localhost', 8080)
     }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,6 +41,8 @@ export default function MemberList() {
       return
     }
 
+    console.log("Fetching members from Firestore...");
+
     // クリーンアップ関数を準備
     let unsubscribe: () => void = () => {}
 
@@ -50,6 +52,7 @@ export default function MemberList() {
       
       // リアルタイムリスナーをセットアップ
       unsubscribe = onSnapshot(q, (snapshot) => {
+        console.log(`Got ${snapshot.docs.length} members from Firestore`);
         const memberData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -71,7 +74,7 @@ export default function MemberList() {
     return () => unsubscribe()
   }, [])
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     const filtered = members.filter(
       (member) =>
         (nameFilter === "" || 
@@ -83,12 +86,13 @@ export default function MemberList() {
         (prefectureFilter === "all" || member.prefecture === prefectureFilter),
     )
     setFilteredMembers(filtered)
-  }
+  }, [nameFilter, typeFilter, prefectureFilter, members])
 
   // フィルター条件が変更されたら自動的にフィルタリングを実行
+   
   useEffect(() => {
     handleFilter()
-  }, [nameFilter, typeFilter, prefectureFilter, members])
+  }, [handleFilter])
 
   return (
     <div className="space-y-4 p-4 md:space-y-6 md:p-6">

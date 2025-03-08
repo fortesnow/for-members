@@ -50,8 +50,15 @@ export default function DashboardPage() {
 
   // 資格種別ごとの会員数を集計
   const qualificationCounts = members.reduce((acc, member) => {
-    acc[member.type] = (acc[member.type] || 0) + 1
-    return acc
+    // types配列がある場合はそれぞれをカウント、なければtypeをカウント
+    if (member.types?.length) {
+      member.types.forEach(type => {
+        acc[type] = (acc[type] || 0) + 1;
+      });
+    } else if (member.type) {
+      acc[member.type] = (acc[member.type] || 0) + 1;
+    }
+    return acc;
   }, {} as Record<string, number>)
 
   // 地域ごとの会員数を集計
