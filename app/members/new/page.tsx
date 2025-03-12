@@ -27,6 +27,32 @@ export default function NewMemberPage() {
     number: "",
   })
 
+  // 電話番号入力時に自動的にハイフンを挿入する関数
+  const formatPhoneNumber = (value: string): string => {
+    // 数字以外の文字（ハイフンなど）を削除
+    const numbers = value.replace(/[^\d]/g, '');
+    
+    // 11桁以上入力されないようにする
+    if (numbers.length > 11) {
+      return formData.phone;
+    }
+    
+    // 電話番号のフォーマットを適用
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+    }
+  };
+
+  // 電話番号入力のハンドラー
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedPhone = formatPhoneNumber(e.target.value);
+    setFormData({ ...formData, phone: formattedPhone });
+  };
+
   // 郵便番号から住所を取得
   async function searchAddress(code: string) {
     if (code.length === 7) {
@@ -241,7 +267,7 @@ export default function NewMemberPage() {
                     id="phone"
                     name="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={handlePhoneChange}
                     placeholder="例：090-1234-5678"
                     className="rounded-full"
                     required

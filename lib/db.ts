@@ -27,6 +27,12 @@ export interface Member {
   postalCode?: string
   streetAddress?: string
   notes?: string
+  isInstructor?: boolean
+  instructorDetails?: {
+    specialties?: string[]
+    experience?: number
+    bio?: string
+  }
   createdAt?: Timestamp
   updatedAt?: Timestamp
 }

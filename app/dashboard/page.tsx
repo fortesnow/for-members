@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react"
 import type { Member } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Award, MapPin, Clock } from "lucide-react"
+import { Users, Award, MapPin, BookOpen } from "lucide-react"
 import { onSnapshot, collection, query, orderBy } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import Link from "next/link"
 
 export default function DashboardPage() {
   const [members, setMembers] = useState<Member[]>([])
@@ -66,6 +67,9 @@ export default function DashboardPage() {
     acc[member.prefecture] = (acc[member.prefecture] || 0) + 1
     return acc
   }, {} as Record<string, number>)
+
+  // 講師として登録されているメンバーをフィルタリング
+  const instructors = members.filter(member => member.isInstructor)
 
   return (
     <div className="space-y-8 px-1 py-4 md:px-4 md:py-6">
@@ -150,37 +154,50 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* 最近の登録 */}
+      {/* 講師一覧 */}
       <Card className="border-accent/40 shadow-sm overflow-hidden">
         <CardHeader className="bg-accent/20">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-primary text-lg">最近の登録</CardTitle>
-            <Clock className="h-5 w-5 text-primary/80" />
+            <CardTitle className="text-primary text-lg">講師担当</CardTitle>
+            <BookOpen className="h-5 w-5 text-primary/80" />
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="space-y-5">
-            {members.slice(0, 5).map((member) => (
-              <div key={member.id} className="flex items-center justify-between border-b border-accent/30 pb-4">
-                <div>
-                  <div className="font-medium">{member.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{member.furigana}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-medium">{member.type || member.types?.join(', ')}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5 flex items-center">
-                    <MapPin className="h-3 w-3 mr-1 inline-block" /> 
-                    {member.prefecture}
+          {instructors.length > 0 ? (
+            <div className="space-y-5">
+              {instructors.map((instructor) => (
+                <div key={instructor.id} className="flex items-center justify-between border-b border-accent/30 pb-4">
+                  <div>
+                    <div className="font-medium">{instructor.name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{instructor.furigana}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm">
+                      <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium">
+                        {instructor.instructorDetails?.specialties?.join(', ') || '専門分野未設定'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1.5 flex items-center justify-end">
+                      <MapPin className="h-3 w-3 mr-1 inline-block" /> 
+                      {instructor.prefecture}
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <Link href={`/members/${instructor.id}`} className="text-primary hover:text-primary/80 text-sm underline">
+                      詳細
+                    </Link>
                   </div>
                 </div>
-              </div>
-            ))}
-            {members.length === 0 && (
-              <div className="text-sm text-muted-foreground italic text-center py-8">
-                最近の登録がありません
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">登録されている講師はいません</p>
+              <p className="text-sm mt-2">
+                会員詳細画面から講師として設定することができます
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

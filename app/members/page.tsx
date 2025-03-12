@@ -239,18 +239,10 @@ export default function MemberList() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">電話：</span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium">
+                      <div className="mt-1 overflow-x-auto">
+                        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
                           {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
                         </span>
-                        <a 
-                          href={`tel:${member.phone}`} 
-                          className="text-primary hover:text-primary/80 inline-flex items-center text-xs"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
-                        </a>
                       </div>
                     </div>
                     <div>
@@ -262,10 +254,26 @@ export default function MemberList() {
                       </div>
                     </div>
                     <div>
+                      <span className="text-muted-foreground">郵便番号：</span>
+                      <div className="mt-1">
+                        {member.postalCode ? (
+                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                            〒{member.postalCode}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">未登録</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
                       <span className="text-muted-foreground">住所：</span>
                       <div className="mt-1">
                         <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                          {member.address || "未登録"}
+                          {member.address 
+                            ? (member.address.startsWith(member.prefecture) 
+                               ? member.address.substring(member.prefecture.length) 
+                               : member.address)
+                            : "未登録"}
                         </span>
                       </div>
                     </div>
@@ -290,6 +298,7 @@ export default function MemberList() {
                     <TableHead>種別</TableHead>
                     <TableHead>電話番号</TableHead>
                     <TableHead>都道府県</TableHead>
+                    <TableHead>郵便番号</TableHead>
                     <TableHead>住所</TableHead>
                     <TableHead>認定証番号</TableHead>
                     <TableHead className="text-right">操作</TableHead>
@@ -324,19 +333,10 @@ export default function MemberList() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium">
+                        <div className="overflow-x-auto">
+                          <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
                             {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
                           </span>
-                          <a 
-                            href={`tel:${member.phone}`} 
-                            className="text-primary hover:text-primary/80"
-                            title="発信"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                          </a>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -345,8 +345,21 @@ export default function MemberList() {
                         </span>
                       </TableCell>
                       <TableCell>
+                        {member.postalCode ? (
+                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                            〒{member.postalCode}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">未登録</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                          {member.address || "未登録"}
+                          {member.address 
+                            ? (member.address.startsWith(member.prefecture) 
+                               ? member.address.substring(member.prefecture.length) 
+                               : member.address)
+                            : "未登録"}
                         </span>
                       </TableCell>
                       <TableCell>
