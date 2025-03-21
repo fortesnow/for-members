@@ -53,15 +53,33 @@ export default function MemberList() {
       
       // リアルタイムリスナーをセットアップ
       unsubscribe = onSnapshot(q, (snapshot) => {
-        console.log(`Got ${snapshot.docs.length} members from Firestore`);
-        const memberData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Member[]
-        
-        setMembers(memberData)
-        setFilteredMembers(memberData)
-        setIsLoading(false)
+        try {
+          console.log(`Got ${snapshot.docs.length} members from Firestore`);
+          
+          if (snapshot.empty) {
+            console.log("No members found in Firestore");
+            setMembers([]);
+            setFilteredMembers([]);
+            setIsLoading(false);
+            return;
+          }
+          
+          const memberData = snapshot.docs.map(doc => {
+            const data = {
+              id: doc.id,
+              ...doc.data()
+            } as Member;
+            return data;
+          })
+          
+          console.log("Member data processed:", memberData.length);
+          setMembers(memberData)
+          setFilteredMembers(memberData)
+        } catch (innerError) {
+          console.error("Error processing Firestore data:", innerError)
+        } finally {
+          setIsLoading(false)
+        }
       }, (error) => {
         console.error("Realtime data error:", error)
         setIsLoading(false)
@@ -72,7 +90,10 @@ export default function MemberList() {
     }
 
     // コンポーネントのアンマウント時にリスナーを解除
-    return () => unsubscribe()
+    return () => {
+      console.log("Unsubscribing from Firestore listener");
+      unsubscribe()
+    }
   }, [])
 
   const handleFilter = useCallback(() => {
@@ -97,11 +118,23 @@ export default function MemberList() {
 
   // 受講年月をフォーマットする関数を追加
   const formatEnrollmentDate = (enrollmentDate: string | undefined) => {
-    if (!enrollmentDate) return "未設定";
+    if (!enrollmentDate) {
+      return (
+        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+          未設定
+        </span>
+      );
+    }
     
     // YYYY年MM月形式から年と月を抽出
     const match = enrollmentDate.match(/(\d{4})年(\d{2})月/);
-    if (!match) return enrollmentDate;
+    if (!match) {
+      return (
+        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+          {enrollmentDate}
+        </span>
+      );
+    }
     
     return (
       <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
