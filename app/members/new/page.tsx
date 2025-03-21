@@ -402,14 +402,14 @@ export default function NewMemberPage() {
                     担当講師
                   </Label>
                   <Select
-                    value={formData.instructor}
-                    onValueChange={(value) => setFormData({ ...formData, instructor: value })}
+                    value={formData.instructor || "unset"}
+                    onValueChange={(value) => setFormData({ ...formData, instructor: value === "unset" ? "" : value })}
                   >
                     <SelectTrigger className="w-full rounded-full">
                       <SelectValue placeholder="担当講師を選択" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">未設定</SelectItem>
+                      <SelectItem value="unset">未設定</SelectItem>
                       {instructors.map((instructor) => (
                         <SelectItem key={instructor.id} value={instructor.name}>
                           {instructor.name}
