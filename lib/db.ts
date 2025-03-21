@@ -149,6 +149,24 @@ export async function getMember(id: string) {
   }
 }
 
+// 講師として登録されているメンバーを取得
+export async function getInstructors() {
+  if (!db) throw new Error("Firestore is not initialized")
+
+  try {
+    const membersRef = collection(db, "members")
+    const q = query(membersRef, where("isInstructor", "==", true))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Member[]
+  } catch (error) {
+    console.error("Error getting instructors:", error)
+    throw new Error("講師情報の取得に失敗しました")
+  }
+}
+
 // 認定証番号を新しいフォーマットに変換する関数
 export function formatCertificateNumber(number: string): string {
   // 数字でない場合はそのまま返す

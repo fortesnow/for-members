@@ -1,14 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { addMember } from "@/lib/db"
+import { addMember, getInstructors } from "@/lib/db"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function NewMemberPage() {
   const router = useRouter()
@@ -18,6 +25,7 @@ export default function NewMemberPage() {
   const [prefecture, setPrefecture] = useState("")
   const [city, setCity] = useState("")
   const [streetAddress, setStreetAddress] = useState("")
+  const [instructors, setInstructors] = useState<Array<{id: string, name: string}>>([])
   const [formData, setFormData] = useState({
     name: "",
     furigana: "",
@@ -82,6 +90,28 @@ export default function NewMemberPage() {
       searchAddress(value)
     }
   }
+
+  // 講師リストの取得
+  useEffect(() => {
+    async function fetchInstructors() {
+      try {
+        const instructorsList = await getInstructors()
+        setInstructors(instructorsList.map(instructor => ({
+          id: instructor.id || '',
+          name: instructor.name
+        })))
+      } catch (error) {
+        console.error("Error fetching instructors:", error)
+        toast({
+          variant: "destructive",
+          title: "エラー",
+          description: "講師リストの取得に失敗しました",
+        })
+      }
+    }
+    
+    fetchInstructors()
+  }, [toast])
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
@@ -371,14 +401,22 @@ export default function NewMemberPage() {
                   <Label htmlFor="instructor" className="text-sm font-medium">
                     担当講師
                   </Label>
-                  <Input
-                    id="instructor"
-                    name="instructor"
+                  <Select
                     value={formData.instructor}
-                    onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-                    placeholder="例：山田 花子"
-                    className="rounded-full"
-                  />
+                    onValueChange={(value) => setFormData({ ...formData, instructor: value })}
+                  >
+                    <SelectTrigger className="w-full rounded-full">
+                      <SelectValue placeholder="担当講師を選択" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">未設定</SelectItem>
+                      {instructors.map((instructor) => (
+                        <SelectItem key={instructor.id} value={instructor.name}>
+                          {instructor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="enrollmentDate" className="text-sm font-medium">
