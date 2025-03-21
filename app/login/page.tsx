@@ -58,11 +58,8 @@ export default function LoginPage() {
       const email = formData.get("username") as string
       const password = formData.get("password") as string
 
-      console.log("Attempting login with:", email) // デバッグ用
-
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
-        console.log("Login successful:", userCredential.user.email) // デバッグ用
         
         const token = await userCredential.user.getIdToken()
         const response = await fetch("/api/auth/login", {

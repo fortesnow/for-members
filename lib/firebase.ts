@@ -27,15 +27,20 @@ if (typeof window !== 'undefined') {
       connectAuthEmulator(auth, "http://localhost:9099")
       connectFirestoreEmulator(db, 'localhost', 8080)
     }
-
-    console.log("Firebase initialized successfully")
+    
+    // デバッグログは開発環境でのみ表示
+    if (process.env.NODE_ENV === "development") {
+      console.log("Firebase initialized successfully")
+    }
   } catch (error) {
     console.error("Firebase initialization error:", error)
   }
 }
 
-console.log("Firebase Auth initialized:", !!auth)
-console.log("Current environment:", process.env.NODE_ENV)
-console.log("Firebase project ID:", app?.options.projectId)
+// 本番環境ではログ出力を削除
+if (process.env.NODE_ENV === "development") {
+  console.log("Firebase Auth initialized:", !!auth)
+  console.log("Current environment:", process.env.NODE_ENV)
+}
 
 export { app, db, auth } 
