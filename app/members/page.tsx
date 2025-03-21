@@ -37,59 +37,11 @@ export default function MemberList() {
   const [nameFilter, setNameFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [prefectureFilter, setPrefectureFilter] = useState("all")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
-  // 認証状態を監視して、データを取得
-  useEffect(() => {
-    if (!auth || !db) {
-      console.error("Firebase is not initialized properly")
-      setIsLoading(false)
-      return
-    }
-
-    console.log("Setting up authentication listener...")
-    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        console.log("User is authenticated:", user.email)
-        try {
-          setIsAuthenticated(true)
-          // 認証確認後にデータを取得
-          await fetchMembersData()
-        } catch (error) {
-          console.error("Error after authentication:", error)
-          toast({
-            title: "データ取得エラー",
-            description: "認証に成功しましたが、データの取得に失敗しました",
-            variant: "destructive",
-          })
-          setIsLoading(false)
-        }
-      } else {
-        console.log("User is not authenticated")
-        setIsAuthenticated(false)
-        setMembers([])
-        setFilteredMembers([])
-        setIsLoading(false)
-        // 認証されていない場合、ログインページにリダイレクト
-        toast({
-          title: "認証エラー",
-          description: "ログインが必要です",
-          variant: "destructive",
-        })
-        router.push("/login")
-      }
-    })
-
-    return () => {
-      console.log("Cleanup auth listener")
-      unsubscribeAuth()
-    }
-  }, [router, toast])
-
   // membersデータを取得する関数
-  const fetchMembersData = async () => {
+  const fetchMembersData = useCallback(async () => {
     console.log("Fetching members data...")
     setIsLoading(true)
 
@@ -144,7 +96,52 @@ export default function MemberList() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [toast]);
+
+  // 認証状態を監視して、データを取得
+  useEffect(() => {
+    if (!auth || !db) {
+      console.error("Firebase is not initialized properly")
+      setIsLoading(false)
+      return
+    }
+
+    console.log("Setting up authentication listener...")
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log("User is authenticated:", user.email)
+        try {
+          // 認証確認後にデータを取得
+          await fetchMembersData()
+        } catch (error) {
+          console.error("Error after authentication:", error)
+          toast({
+            title: "データ取得エラー",
+            description: "認証に成功しましたが、データの取得に失敗しました",
+            variant: "destructive",
+          })
+          setIsLoading(false)
+        }
+      } else {
+        console.log("User is not authenticated")
+        setMembers([])
+        setFilteredMembers([])
+        setIsLoading(false)
+        // 認証されていない場合、ログインページにリダイレクト
+        toast({
+          title: "認証エラー",
+          description: "ログインが必要です",
+          variant: "destructive",
+        })
+        router.push("/login")
+      }
+    })
+
+    return () => {
+      console.log("Cleanup auth listener")
+      unsubscribeAuth()
+    }
+  }, [router, toast, fetchMembersData])
 
   const handleFilter = useCallback(() => {
     const filtered = members.filter(
