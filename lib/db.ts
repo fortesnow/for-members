@@ -145,4 +145,26 @@ export async function getMember(id: string) {
     console.error("Error getting member:", error)
     throw new Error("会員情報の取得に失敗しました")
   }
+}
+
+// 認定証番号を新しいフォーマットに変換する関数
+export function formatCertificateNumber(number: string): string {
+  // 数字でない場合はそのまま返す
+  if (!/^\d+$/.test(number)) {
+    return number;
+  }
+  
+  // 4桁未満の場合はそのまま返す
+  if (number.length < 4) {
+    return number;
+  }
+  
+  // 最初の2桁を抽出
+  const prefix = number.slice(0, 2);
+  
+  // 残りの数字を抽出し、3桁になるように0埋め
+  const suffix = number.slice(2).padStart(3, '0');
+  
+  // 新しいフォーマットで返す（xx-00xxx）
+  return `${prefix}-${suffix.padStart(5, '0')}`;
 } 

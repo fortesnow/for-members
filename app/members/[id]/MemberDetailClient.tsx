@@ -9,6 +9,7 @@ import Link from "next/link"
 import { getDoc, doc, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { deleteMember, updateMember } from "@/lib/db"
+import { formatCertificateNumber } from "@/lib/db"
 import { Loader2, Trash2, BookOpen, Save, MapPin } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { Switch } from "@/components/ui/switch"
@@ -404,7 +405,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
               <dt className="font-medium text-gray-500">認定証番号</dt>
               <dd className="mt-2">
                 <span className="inline-flex items-center justify-center rounded-md bg-secondary px-3 py-1 text-sm font-medium min-w-[100px] text-center">
-                  {member.number}
+                  {formatCertificateNumber(member.number)}
                 </span>
               </dd>
             </div>

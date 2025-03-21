@@ -1,6 +1,7 @@
 "use client"
 
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { formatCertificateNumber } from '@/lib/db'
 
 type Member = {
   id: number
@@ -52,6 +53,7 @@ const MemberPDF = ({ members }: { members: Member[] }) => (
           <Text style={styles.tableCell}>種別</Text>
           <Text style={styles.tableCell}>電話番号</Text>
           <Text style={styles.tableCell}>都道府県</Text>
+          <Text style={styles.tableCell}>認定証番号</Text>
         </View>
         {/* メンバーデータ */}
         {members.map((member, index) => (
@@ -60,6 +62,7 @@ const MemberPDF = ({ members }: { members: Member[] }) => (
             <Text style={styles.tableCell}>{member.type}</Text>
             <Text style={styles.tableCell}>{member.phone}</Text>
             <Text style={styles.tableCell}>{member.prefecture}</Text>
+            <Text style={styles.tableCell}>{formatCertificateNumber(member.number)}</Text>
           </View>
         ))}
       </View>

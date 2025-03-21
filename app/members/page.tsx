@@ -24,6 +24,7 @@ import { PDFDownloadButton } from "@/components/pdf-download-button"
 import { db } from "@/lib/firebase"
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
 import type { Member } from "@/lib/db"
+import { formatCertificateNumber } from "@/lib/db"
 
 export default function MemberList() {
   const [members, setMembers] = useState<Member[]>([])
@@ -282,7 +283,7 @@ export default function MemberList() {
                       <span className="text-muted-foreground">認定証番号：</span>
                       <div className="mt-1">
                         <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
-                          {member.number}
+                          {formatCertificateNumber(member.number)}
                         </span>
                       </div>
                     </div>
@@ -368,7 +369,7 @@ export default function MemberList() {
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
-                          {member.number}
+                          {formatCertificateNumber(member.number)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
