@@ -21,8 +21,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { PDFDownloadButton } from "@/components/pdf-download-button"
-import { db } from "@/lib/firebase"
+import { db, auth } from "@/lib/firebase"
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
+import { onAuthStateChanged } from "firebase/auth"
+import { useToast } from "@/components/ui/use-toast"
+import { useRouter } from "next/navigation"
 import type { Member } from "@/lib/db"
 import { formatCertificateNumber } from "@/lib/db"
 
@@ -33,16 +36,47 @@ export default function MemberList() {
   const [nameFilter, setNameFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [prefectureFilter, setPrefectureFilter] = useState("all")
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { toast } = useToast()
+  const router = useRouter()
 
-  // Firestoreからリアルタイムでデータを取得
+  // 認証状態を監視
   useEffect(() => {
-    if (!db) {
-      console.error("Firestore is not initialized")
+    if (!auth) {
+      console.error("Firebase Auth is not initialized")
       setIsLoading(false)
       return
     }
 
-    console.log("Fetching members from Firestore...");
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User is authenticated:", user.email)
+        setIsAuthenticated(true)
+      } else {
+        console.log("User is not authenticated")
+        setIsAuthenticated(false)
+        // 認証されていない場合、ログインページにリダイレクト
+        toast({
+          title: "認証エラー",
+          description: "ログインが必要です",
+          variant: "destructive",
+        })
+        router.push("/login")
+      }
+    })
+
+    return () => unsubscribe()
+  }, [router, toast])
+
+  // Firestoreからリアルタイムでデータを取得
+  useEffect(() => {
+    if (!db || !isAuthenticated) {
+      if (!db) console.error("Firestore is not initialized")
+      if (!isAuthenticated) console.log("Waiting for authentication...")
+      return
+    }
+
+    console.log("Fetching members from Firestore...")
 
     // クリーンアップ関数を準備
     let unsubscribe: () => void = () => {}
@@ -77,15 +111,30 @@ export default function MemberList() {
           setFilteredMembers(memberData)
         } catch (innerError) {
           console.error("Error processing Firestore data:", innerError)
+          toast({
+            title: "データ処理エラー",
+            description: "会員データの処理中にエラーが発生しました",
+            variant: "destructive",
+          })
         } finally {
           setIsLoading(false)
         }
       }, (error) => {
         console.error("Realtime data error:", error)
+        toast({
+          title: "データ取得エラー",
+          description: "認証に問題があるか、データベースへのアクセス権限がありません",
+          variant: "destructive",
+        })
         setIsLoading(false)
       })
     } catch (error) {
       console.error("Error setting up realtime listener:", error)
+      toast({
+        title: "接続エラー",
+        description: "データベース接続の設定中にエラーが発生しました",
+        variant: "destructive",
+      })
       setIsLoading(false)
     }
 
@@ -94,7 +143,7 @@ export default function MemberList() {
       console.log("Unsubscribing from Firestore listener");
       unsubscribe()
     }
-  }, [])
+  }, [isAuthenticated, toast])
 
   const handleFilter = useCallback(() => {
     const filtered = members.filter(
