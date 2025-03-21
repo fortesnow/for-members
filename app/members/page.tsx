@@ -22,12 +22,13 @@ import {
 } from "@/components/ui/table"
 import { PDFDownloadButton } from "@/components/pdf-download-button"
 import { db, auth } from "@/lib/firebase"
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
+import { collection, query, orderBy, getDocs } from "firebase/firestore"
 import { onAuthStateChanged } from "firebase/auth"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import type { Member } from "@/lib/db"
 import { formatCertificateNumber } from "@/lib/db"
+import { FirebaseError } from "firebase/app"
 
 export default function MemberList() {
   const [members, setMembers] = useState<Member[]>([])
@@ -40,21 +41,37 @@ export default function MemberList() {
   const { toast } = useToast()
   const router = useRouter()
 
-  // 認証状態を監視
+  // 認証状態を監視して、データを取得
   useEffect(() => {
-    if (!auth) {
-      console.error("Firebase Auth is not initialized")
+    if (!auth || !db) {
+      console.error("Firebase is not initialized properly")
       setIsLoading(false)
       return
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    console.log("Setting up authentication listener...")
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("User is authenticated:", user.email)
-        setIsAuthenticated(true)
+        try {
+          setIsAuthenticated(true)
+          // 認証確認後にデータを取得
+          await fetchMembersData()
+        } catch (error) {
+          console.error("Error after authentication:", error)
+          toast({
+            title: "データ取得エラー",
+            description: "認証に成功しましたが、データの取得に失敗しました",
+            variant: "destructive",
+          })
+          setIsLoading(false)
+        }
       } else {
         console.log("User is not authenticated")
         setIsAuthenticated(false)
+        setMembers([])
+        setFilteredMembers([])
+        setIsLoading(false)
         // 認証されていない場合、ログインページにリダイレクト
         toast({
           title: "認証エラー",
@@ -65,85 +82,69 @@ export default function MemberList() {
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      console.log("Cleanup auth listener")
+      unsubscribeAuth()
+    }
   }, [router, toast])
 
-  // Firestoreからリアルタイムでデータを取得
-  useEffect(() => {
-    if (!db || !isAuthenticated) {
-      if (!db) console.error("Firestore is not initialized")
-      if (!isAuthenticated) console.log("Waiting for authentication...")
+  // membersデータを取得する関数
+  const fetchMembersData = async () => {
+    console.log("Fetching members data...")
+    setIsLoading(true)
+
+    if (!db) {
+      console.error("Firestore is not initialized")
+      setIsLoading(false)
+      toast({
+        title: "初期化エラー",
+        description: "データベース接続が初期化されていません",
+        variant: "destructive",
+      })
       return
     }
 
-    console.log("Fetching members from Firestore...")
-
-    // クリーンアップ関数を準備
-    let unsubscribe: () => void = () => {}
-
     try {
+      // 同期的に一度データを取得
       const membersRef = collection(db, "members")
       const q = query(membersRef, orderBy("createdAt", "desc"))
-      
-      // リアルタイムリスナーをセットアップ
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        try {
-          console.log(`Got ${snapshot.docs.length} members from Firestore`);
-          
-          if (snapshot.empty) {
-            console.log("No members found in Firestore");
-            setMembers([]);
-            setFilteredMembers([]);
-            setIsLoading(false);
-            return;
-          }
-          
-          const memberData = snapshot.docs.map(doc => {
-            const data = {
-              id: doc.id,
-              ...doc.data()
-            } as Member;
-            return data;
-          })
-          
-          console.log("Member data processed:", memberData.length);
-          setMembers(memberData)
-          setFilteredMembers(memberData)
-        } catch (innerError) {
-          console.error("Error processing Firestore data:", innerError)
-          toast({
-            title: "データ処理エラー",
-            description: "会員データの処理中にエラーが発生しました",
-            variant: "destructive",
-          })
-        } finally {
-          setIsLoading(false)
-        }
-      }, (error) => {
-        console.error("Realtime data error:", error)
-        toast({
-          title: "データ取得エラー",
-          description: "認証に問題があるか、データベースへのアクセス権限がありません",
-          variant: "destructive",
-        })
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        console.log("No members found in Firestore")
+        setMembers([])
+        setFilteredMembers([])
         setIsLoading(false)
-      })
+        return
+      }
+
+      const memberData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Member[]
+
+      console.log(`Fetched ${memberData.length} members successfully`)
+      setMembers(memberData)
+      setFilteredMembers(memberData)
     } catch (error) {
-      console.error("Error setting up realtime listener:", error)
+      console.error("Error fetching members:", error)
       toast({
-        title: "接続エラー",
-        description: "データベース接続の設定中にエラーが発生しました",
+        title: "データ取得エラー",
+        description: "会員データの取得中にエラーが発生しました",
         variant: "destructive",
       })
+      // セキュリティルールに問題がある場合はRulesの更新を提案
+      if (error instanceof FirebaseError && error.message.includes("permission")) {
+        toast({
+          title: "セキュリティルールエラー",
+          description: "Firestoreのセキュリティルールを確認してください",
+          variant: "destructive",
+        })
+      }
+    } finally {
       setIsLoading(false)
     }
-
-    // コンポーネントのアンマウント時にリスナーを解除
-    return () => {
-      console.log("Unsubscribing from Firestore listener");
-      unsubscribe()
-    }
-  }, [isAuthenticated, toast])
+  }
 
   const handleFilter = useCallback(() => {
     const filtered = members.filter(
