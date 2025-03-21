@@ -95,7 +95,13 @@ export default function EditMemberPage() {
           if (match) {
             setSelectedYear(match[1])
             setSelectedMonth(match[2])
+          } else {
+            setSelectedYear("unset")
+            setSelectedMonth("unset")
           }
+        } else {
+          setSelectedYear("unset")
+          setSelectedMonth("unset")
         }
         
         setPostalCode(member.postalCode || "")
@@ -199,7 +205,7 @@ export default function EditMemberPage() {
 
   // 受講年月を更新する関数
   const updateEnrollmentDate = (year: string, month: string) => {
-    if (year && month) {
+    if (year && year !== "unset" && month && month !== "unset") {
       const formattedDate = `${year}年${month}月`
       setFormData(prev => ({ ...prev, enrollmentDate: formattedDate }))
     } else {
@@ -594,7 +600,7 @@ export default function EditMemberPage() {
                         <SelectValue placeholder="年" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">未選択</SelectItem>
+                        <SelectItem value="unset">未選択</SelectItem>
                         {generateYearOptions().map(year => (
                           <SelectItem key={year} value={year}>
                             {year}年
@@ -610,7 +616,7 @@ export default function EditMemberPage() {
                         <SelectValue placeholder="月" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">未選択</SelectItem>
+                        <SelectItem value="unset">未選択</SelectItem>
                         {generateMonthOptions().map(month => (
                           <SelectItem key={month} value={month}>
                             {month}月
