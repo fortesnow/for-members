@@ -103,17 +103,10 @@ export default function MemberList() {
     const match = enrollmentDate.match(/(\d{4})年(\d{2})月/);
     if (!match) return enrollmentDate;
     
-    const year = match[1];
-    const month = match[2];
     return (
-      <>
-        <span className="inline-block bg-blue-100 text-blue-800 rounded-l-md px-2 py-0.5 text-xs font-medium">
-          {year}年
-        </span>
-        <span className="inline-block bg-green-100 text-green-800 rounded-r-md px-2 py-0.5 text-xs font-medium border-l border-white/20">
-          {month}月
-        </span>
-      </>
+      <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+        {match[1]}年{match[2]}月
+      </span>
     );
   };
 
