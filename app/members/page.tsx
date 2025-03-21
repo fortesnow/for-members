@@ -239,10 +239,18 @@ export default function MemberList() {
                       </div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">電話：</span>
+                      <span className="text-muted-foreground">担当講師：</span>
                       <div className="mt-1 overflow-x-auto">
                         <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
-                          {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
+                          {member.instructor || "未設定"}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">受講年月：</span>
+                      <div className="mt-1">
+                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                          {member.enrollmentDate || "未設定"}
                         </span>
                       </div>
                     </div>
@@ -251,31 +259,6 @@ export default function MemberList() {
                       <div className="mt-1">
                         <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.prefecture}
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">郵便番号：</span>
-                      <div className="mt-1">
-                        {member.postalCode ? (
-                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                            <span className="inline-block">〒</span>{member.postalCode}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-xs">未登録</span>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">住所：</span>
-                      <div className="mt-1">
-                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                          {member.address 
-                            ? (member.address.startsWith(member.prefecture) 
-                               ? member.address.substring(member.prefecture.length) 
-                               : member.address)
-                            : "未登録"}
-                          {member.streetAddress && !member.address?.includes(member.streetAddress) && ` ${member.streetAddress}`}
                         </span>
                       </div>
                     </div>
@@ -298,10 +281,9 @@ export default function MemberList() {
                   <TableRow>
                     <TableHead className="w-[200px]">名前 / ふりがな</TableHead>
                     <TableHead>種別</TableHead>
-                    <TableHead>電話番号</TableHead>
+                    <TableHead>担当講師</TableHead>
+                    <TableHead>受講年月</TableHead>
                     <TableHead>都道府県</TableHead>
-                    <TableHead>郵便番号</TableHead>
-                    <TableHead>住所</TableHead>
                     <TableHead>認定証番号</TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
@@ -337,35 +319,19 @@ export default function MemberList() {
                       <TableCell>
                         <div className="overflow-x-auto">
                           <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
-                            {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
+                            {member.instructor || "未設定"}
                           </span>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center justify-center rounded-md bg-gray-100 px-2.5 py-0.5 text-xs font-medium min-w-[80px] text-center">
+                          {member.enrollmentDate || "未設定"}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
                           {member.prefecture}
                         </span>
-                      </TableCell>
-                      <TableCell>
-                        {member.postalCode ? (
-                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                            <span className="inline-block">〒</span>{member.postalCode}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-xs">未登録</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                            {member.address 
-                              ? (member.address.startsWith(member.prefecture) 
-                                 ? member.address.substring(member.prefecture.length) 
-                                 : member.address)
-                              : "未登録"}
-                            {member.streetAddress && !member.address?.includes(member.streetAddress) && ` ${member.streetAddress}`}
-                          </span>
-                        </div>
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
@@ -392,4 +358,5 @@ export default function MemberList() {
     </div>
   )
 }
+
 

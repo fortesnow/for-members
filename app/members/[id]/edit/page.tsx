@@ -29,6 +29,8 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
     number: "",
     email: "",
     notes: "",
+    instructor: "",
+    enrollmentDate: "",
   })
 
   // 電話番号入力時に自動的にハイフンを挿入する関数
@@ -71,6 +73,8 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
           number: member.number || "",
           email: member.email || "",
           notes: member.notes || "",
+          instructor: member.instructor || "",
+          enrollmentDate: member.enrollmentDate || "",
         })
         setPostalCode(member.postalCode || "")
         setPrefecture(member.prefecture || "")
@@ -181,6 +185,8 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
         streetAddress: street,
         number: formData.get("number") as string,
         notes: formData.get("notes") as string,
+        instructor: formData.get("instructor") as string,
+        enrollmentDate: formData.get("enrollmentDate") as string,
       }
 
       await updateMember(id, member)
@@ -461,6 +467,35 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
                   placeholder="備考欄"
                   className="rounded-full"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instructor" className="text-sm font-medium">
+                    担当講師
+                  </Label>
+                  <Input
+                    id="instructor"
+                    name="instructor"
+                    value={formData.instructor}
+                    onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                    placeholder="例：山田 花子"
+                    className="rounded-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrollmentDate" className="text-sm font-medium">
+                    受講年月
+                  </Label>
+                  <Input
+                    id="enrollmentDate"
+                    name="enrollmentDate"
+                    value={formData.enrollmentDate}
+                    onChange={(e) => setFormData({ ...formData, enrollmentDate: e.target.value })}
+                    placeholder="例：2023年01月"
+                    className="rounded-full"
+                  />
+                </div>
               </div>
             </div>
 

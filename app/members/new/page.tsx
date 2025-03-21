@@ -26,6 +26,9 @@ export default function NewMemberPage() {
     phone: "",
     number: "",
     email: "",
+    notes: "",
+    instructor: "",
+    enrollmentDate: "",
   })
 
   // 電話番号入力時に自動的にハイフンを挿入する関数
@@ -90,16 +93,17 @@ export default function NewMemberPage() {
         name: formData.get("name") as string,
         furigana: formData.get("furigana") as string,
         types: selectedTypes,
-        // 後方互換性のために最初の選択を単一のtypeフィールドにも設定
         type: selectedTypes.length > 0 ? selectedTypes[0] : "",
         phone: formData.get("phone") as string,
+        email: formData.get("email") as string,
         prefecture: prefecture,
         postalCode: postalCode,
         address: city,
         streetAddress: streetAddress,
         number: formData.get("number") as string,
-        email: formData.get("email") as string,
-        notes: "",
+        notes: formData.get("notes") as string,
+        instructor: formData.get("instructor") as string,
+        enrollmentDate: formData.get("enrollmentDate") as string,
       }
 
       await addMember(member)
@@ -346,6 +350,49 @@ export default function NewMemberPage() {
                   className="rounded-full"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes" className="text-sm font-medium">
+                  備考
+                </Label>
+                <Input
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="備考欄"
+                  className="rounded-full"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instructor" className="text-sm font-medium">
+                    担当講師
+                  </Label>
+                  <Input
+                    id="instructor"
+                    name="instructor"
+                    value={formData.instructor}
+                    onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                    placeholder="例：山田 花子"
+                    className="rounded-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrollmentDate" className="text-sm font-medium">
+                    受講年月
+                  </Label>
+                  <Input
+                    id="enrollmentDate"
+                    name="enrollmentDate"
+                    value={formData.enrollmentDate}
+                    onChange={(e) => setFormData({ ...formData, enrollmentDate: e.target.value })}
+                    placeholder="例：2023年01月"
+                    className="rounded-full"
+                  />
+                </div>
               </div>
             </div>
 

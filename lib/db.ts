@@ -27,6 +27,8 @@ export interface Member {
   postalCode?: string
   streetAddress?: string
   notes?: string
+  instructor?: string  // 担当講師
+  enrollmentDate?: string  // 受講年月
   isInstructor?: boolean
   instructorDetails?: {
     specialties?: string[]
