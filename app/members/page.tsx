@@ -259,7 +259,7 @@ export default function MemberList() {
                       <div className="mt-1">
                         {member.postalCode ? (
                           <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                            〒{member.postalCode}
+                            <span className="inline-block">〒</span>{member.postalCode}
                           </span>
                         ) : (
                           <span className="text-gray-400 text-xs">未登録</span>
@@ -349,7 +349,7 @@ export default function MemberList() {
                       <TableCell>
                         {member.postalCode ? (
                           <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                            〒{member.postalCode}
+                            <span className="inline-block">〒</span>{member.postalCode}
                           </span>
                         ) : (
                           <span className="text-gray-400 text-xs">未登録</span>
