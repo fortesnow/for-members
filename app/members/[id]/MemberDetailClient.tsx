@@ -72,6 +72,7 @@ type Member = {
     bio?: string
   }
   postalCode?: string
+  email?: string
 }
 
 // 住所から郵便番号を取得する関数
@@ -370,6 +371,14 @@ export default function MemberDetailClient({ id }: { id: string }) {
               </dd>
             </div>
             <div>
+              <dt className="font-medium text-gray-500">メールアドレス</dt>
+              <dd className="mt-2 overflow-x-auto">
+                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap">
+                  {member.email || "未登録"}
+                </span>
+              </dd>
+            </div>
+            <div>
               <dt className="font-medium text-gray-500">会員種別</dt>
               <dd className="flex flex-wrap gap-2 mt-2">
                 {member.types?.length 
@@ -436,17 +445,28 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div className="sm:col-span-2">
               <dt className="font-medium text-gray-500">住所</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
-                  {member.address 
-                    ? (member.address.startsWith(member.prefecture) 
-                       ? member.address.substring(member.prefecture.length) 
-                       : member.address)
-                    : "未登録"}
-                </span>
-                {member.streetAddress && (
-                  <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium ml-2">
-                    {member.streetAddress}
-                  </span>
+                {member.prefecture || member.address || member.streetAddress ? (
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {member.prefecture && (
+                      <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
+                        {member.prefecture}
+                      </span>
+                    )}
+                    {member.address && (
+                      <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
+                        {member.address.startsWith(member.prefecture) 
+                          ? member.address.substring(member.prefecture.length) 
+                          : member.address}
+                      </span>
+                    )}
+                    {member.streetAddress && !member.address?.includes(member.streetAddress) && (
+                      <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
+                        {member.streetAddress}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-gray-400">未登録</span>
                 )}
               </dd>
             </div>

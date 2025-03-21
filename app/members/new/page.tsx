@@ -25,6 +25,7 @@ export default function NewMemberPage() {
     types: [] as string[],
     phone: "",
     number: "",
+    email: "",
   })
 
   // 電話番号入力時に自動的にハイフンを挿入する関数
@@ -97,7 +98,7 @@ export default function NewMemberPage() {
         address: city,
         streetAddress: streetAddress,
         number: formData.get("number") as string,
-        email: "",
+        email: formData.get("email") as string,
         notes: "",
       }
 
@@ -284,6 +285,21 @@ export default function NewMemberPage() {
                     className="w-32"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  メールアドレス
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="例：example@mail.com"
+                  className="rounded-full"
+                />
               </div>
 
               <div className="space-y-2">

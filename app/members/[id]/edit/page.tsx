@@ -27,6 +27,7 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
     types: [] as string[],
     phone: "",
     number: "",
+    email: "",
   })
 
   // 電話番号入力時に自動的にハイフンを挿入する関数
@@ -67,11 +68,25 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
           types: member.types || [],
           phone: member.phone || "",
           number: member.number || "",
+          email: member.email || "",
         })
         setPostalCode(member.postalCode || "")
         setPrefecture(member.prefecture || "")
-        setCity(member.address || "")
-        setStreetAddress(member.streetAddress || "")
+        
+        // 住所と番地の重複チェック
+        let cityAddress = member.address || "";
+        const street = member.streetAddress || "";
+        
+        // 住所に番地情報が含まれている場合は除去する
+        if (cityAddress && street && cityAddress.includes(street)) {
+          const streetIndex = cityAddress.indexOf(street);
+          if (streetIndex > 0) {
+            cityAddress = cityAddress.substring(0, streetIndex).trim();
+          }
+        }
+        
+        setCity(cityAddress)
+        setStreetAddress(street)
       } catch (error) {
         console.error("Error fetching member:", error)
         toast({
@@ -93,13 +108,32 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
       try {
         const res = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${code}`)
         const data = await res.json()
-        if (data.results) {
+        
+        if (data.results && data.results.length > 0) {
           const address = data.results[0]
-          setPrefecture(address.address1)
-          setCity(address.address2 + address.address3)
+          
+          // 都道府県を設定
+          if (address.address1) {
+            setPrefecture(address.address1)
+          }
+          
+          // 市区町村部分を設定
+          const address2 = address.address2 || "";
+          const address3 = address.address3 || "";
+          const cityPart = address2 + address3;
+          
+          // 市区町村をそのまま設定（番地の分離はしない）
+          setCity(cityPart);
+          
+          console.log("郵便番号から取得した住所:", {
+            prefecture: address.address1,
+            city: cityPart
+          });
+        } else {
+          console.log("郵便番号に該当する住所が見つかりませんでした");
         }
-      } catch {
-        console.error("郵便番号検索エラー")
+      } catch (error) {
+        console.error("郵便番号検索エラー:", error);
       }
     }
   }
@@ -119,6 +153,18 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
       // フォームからチェックボックスの値を取得
       const selectedTypes = Array.from(formData.getAll("types")) as string[];
       
+      // 住所と番地の重複チェック
+      let cityAddress = city;
+      const street = streetAddress;
+      
+      // 市区町村に番地情報が含まれている場合は除去する
+      if (cityAddress && street && cityAddress.includes(street)) {
+        const streetIndex = cityAddress.indexOf(street);
+        if (streetIndex > 0) {
+          cityAddress = cityAddress.substring(0, streetIndex).trim();
+        }
+      }
+      
       const member = {
         name: formData.get("name") as string,
         furigana: formData.get("furigana") as string,
@@ -126,10 +172,11 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
         // 後方互換性のために最初の選択を単一のtypeフィールドにも設定
         type: selectedTypes.length > 0 ? selectedTypes[0] : "",
         phone: formData.get("phone") as string,
+        email: formData.get("email") as string,
         prefecture: prefecture,
         postalCode: postalCode,
-        address: city,
-        streetAddress: streetAddress,
+        address: cityAddress,
+        streetAddress: street,
         number: formData.get("number") as string,
       }
 
@@ -327,6 +374,21 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  メールアドレス
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="例：example@mail.com"
+                  className="rounded-full"
+                />
               </div>
 
               <div className="space-y-2">

@@ -62,6 +62,14 @@ export default function DashboardPage() {
     return acc;
   }, {} as Record<string, number>)
 
+  // 許可された資格種別のみにフィルタリング
+  const allowedQualifications = {
+    "ベビーマッサージマスター": qualificationCounts["ベビーマッサージマスター"] || 0,
+    "ベビーヨガマスター": qualificationCounts["ベビーヨガマスター"] || 0,
+    "ベビーマッサージインストラクター": qualificationCounts["ベビーマッサージインストラクター"] || 0,
+    "ベビーヨガインストラクター": qualificationCounts["ベビーヨガインストラクター"] || 0
+  };
+
   // 地域ごとの会員数を集計
   const regionCounts = members.reduce((acc, member) => {
     acc[member.prefecture] = (acc[member.prefecture] || 0) + 1
@@ -99,7 +107,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             <div className="space-y-3">
-              {Object.entries(qualificationCounts).map(([type, count]) => (
+              {Object.entries(allowedQualifications).map(([type, count]) => (
                 <div key={type} className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground font-medium">{type}</span>
                   <div className="flex items-center">
@@ -115,7 +123,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
-              {Object.keys(qualificationCounts).length === 0 && (
+              {Object.keys(allowedQualifications).length === 0 && (
                 <div className="text-sm text-muted-foreground italic">データがありません</div>
               )}
             </div>

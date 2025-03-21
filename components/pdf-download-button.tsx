@@ -15,6 +15,7 @@ type Member = {
   phone: string
   prefecture: string
   address?: string
+  streetAddress?: string
   number: string
 }
 
@@ -68,6 +69,7 @@ export function PDFDownloadButton({ members }: PDFDownloadButtonProps) {
             table {
               width: 100%;
               border-collapse: collapse;
+              table-layout: fixed;
             }
             th {
               background-color: #FB923C;
@@ -77,10 +79,19 @@ export function PDFDownloadButton({ members }: PDFDownloadButtonProps) {
               font-weight: bold;
               font-size: 14px;
             }
+            th:nth-child(1) { width: 8%; }  /* 会員番号 */
+            th:nth-child(2) { width: 10%; } /* 名前 */
+            th:nth-child(3) { width: 12%; } /* ふりがな */
+            th:nth-child(4) { width: 16%; } /* 種別 */
+            th:nth-child(5) { width: 12%; } /* 電話番号 */
+            th:nth-child(6) { width: 10%; } /* 都道府県 */
+            th:nth-child(7) { width: 16%; } /* 住所 */
+            th:nth-child(8) { width: 16%; } /* 番地・建物名 */
             td {
               padding: 8px;
               border-bottom: 1px solid #ddd;
               font-size: 14px;
+              word-break: break-word;
             }
             tr:nth-child(even) {
               background-color: #FBF5E4;
@@ -108,6 +119,7 @@ export function PDFDownloadButton({ members }: PDFDownloadButtonProps) {
                 <th>電話番号</th>
                 <th>都道府県</th>
                 <th>住所</th>
+                <th>番地・建物名</th>
               </tr>
             </thead>
             <tbody>
@@ -119,7 +131,12 @@ export function PDFDownloadButton({ members }: PDFDownloadButtonProps) {
                   <td>${member.types?.length ? member.types.join(", ") : (member.type || '')}</td>
                   <td>${member.phone}</td>
                   <td>${member.prefecture}</td>
-                  <td>${member.address || ''}</td>
+                  <td>${member.address 
+                        ? (member.address.startsWith(member.prefecture) 
+                          ? member.address.substring(member.prefecture.length) 
+                          : member.address) 
+                        : ''}</td>
+                  <td>${member.streetAddress || ''}</td>
                 </tr>
               `).join('')}
             </tbody>

@@ -274,6 +274,7 @@ export default function MemberList() {
                                ? member.address.substring(member.prefecture.length) 
                                : member.address)
                             : "未登録"}
+                          {member.streetAddress && !member.address?.includes(member.streetAddress) && ` ${member.streetAddress}`}
                         </span>
                       </div>
                     </div>
@@ -354,13 +355,16 @@ export default function MemberList() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                          {member.address 
-                            ? (member.address.startsWith(member.prefecture) 
-                               ? member.address.substring(member.prefecture.length) 
-                               : member.address)
-                            : "未登録"}
-                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                            {member.address 
+                              ? (member.address.startsWith(member.prefecture) 
+                                 ? member.address.substring(member.prefecture.length) 
+                                 : member.address)
+                              : "未登録"}
+                            {member.streetAddress && !member.address?.includes(member.streetAddress) && ` ${member.streetAddress}`}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center justify-center rounded-md bg-secondary px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
