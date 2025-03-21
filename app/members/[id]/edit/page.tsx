@@ -65,7 +65,7 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
           name: member.name || "",
           furigana: member.furigana || "",
           type: member.type || "",
-          types: member.types || [],
+          types: member.types || (member.type ? [member.type] : []),
           phone: member.phone || "",
           number: member.number || "",
           email: member.email || "",
