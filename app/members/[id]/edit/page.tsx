@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { getMember, updateMember, getInstructors } from "@/lib/db"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
@@ -17,8 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function EditMemberPage({ params }: { params: { id: string } }) {
-  const id = params.id
+export default function EditMemberPage() {
+  // useParamsフックを使用してルートパラメータにアクセス
+  const params = useParams()
+  const id = params.id as string
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
@@ -28,6 +30,8 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
   const [city, setCity] = useState("")
   const [streetAddress, setStreetAddress] = useState("")
   const [instructors, setInstructors] = useState<Array<{id: string, name: string}>>([])
+  const [selectedYear, setSelectedYear] = useState<string>("")
+  const [selectedMonth, setSelectedMonth] = useState<string>("")
   const [formData, setFormData] = useState({
     name: "",
     furigana: "",
@@ -84,6 +88,16 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
           instructor: member.instructor || "",
           enrollmentDate: member.enrollmentDate || "",
         })
+        
+        // 受講年月から年と月を抽出
+        if (member.enrollmentDate) {
+          const match = member.enrollmentDate.match(/(\d{4})年(\d{2})月/)
+          if (match) {
+            setSelectedYear(match[1])
+            setSelectedMonth(match[2])
+          }
+        }
+        
         setPostalCode(member.postalCode || "")
         setPrefecture(member.prefecture || "")
         
@@ -181,6 +195,52 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
     if (value.length === 7) {
       searchAddress(value)
     }
+  }
+
+  // 受講年月を更新する関数
+  const updateEnrollmentDate = (year: string, month: string) => {
+    if (year && month) {
+      const formattedDate = `${year}年${month}月`
+      setFormData(prev => ({ ...prev, enrollmentDate: formattedDate }))
+    } else {
+      setFormData(prev => ({ ...prev, enrollmentDate: "" }))
+    }
+  }
+
+  // 年を選択したときの処理
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year)
+    updateEnrollmentDate(year, selectedMonth)
+  }
+
+  // 月を選択したときの処理
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month)
+    updateEnrollmentDate(selectedYear, month)
+  }
+
+  // 年の選択肢を生成する（現在の年の前後10年）
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear()
+    const startYear = currentYear - 10
+    const endYear = currentYear + 10
+    const years = []
+    
+    for (let year = startYear; year <= endYear; year++) {
+      years.push(year.toString())
+    }
+    
+    return years
+  }
+
+  // 月の選択肢を生成する
+  const generateMonthOptions = () => {
+    const months = []
+    for (let month = 1; month <= 12; month++) {
+      // 月を2桁で表示（例：01, 02, ..., 12）
+      months.push(month.toString().padStart(2, '0'))
+    }
+    return months
   }
 
   async function handleSubmit(formData: FormData) {
@@ -525,13 +585,45 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
                   <Label htmlFor="enrollmentDate" className="text-sm font-medium">
                     受講年月
                   </Label>
+                  <div className="flex gap-2">
+                    <Select
+                      value={selectedYear}
+                      onValueChange={handleYearChange}
+                    >
+                      <SelectTrigger className="rounded-full w-24">
+                        <SelectValue placeholder="年" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">未選択</SelectItem>
+                        {generateYearOptions().map(year => (
+                          <SelectItem key={year} value={year}>
+                            {year}年
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={selectedMonth}
+                      onValueChange={handleMonthChange}
+                    >
+                      <SelectTrigger className="rounded-full w-24">
+                        <SelectValue placeholder="月" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">未選択</SelectItem>
+                        {generateMonthOptions().map(month => (
+                          <SelectItem key={month} value={month}>
+                            {month}月
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Input
                     id="enrollmentDate"
                     name="enrollmentDate"
                     value={formData.enrollmentDate}
-                    onChange={(e) => setFormData({ ...formData, enrollmentDate: e.target.value })}
-                    placeholder="例：2023年01月"
-                    className="rounded-full"
+                    type="hidden"
                   />
                 </div>
               </div>
