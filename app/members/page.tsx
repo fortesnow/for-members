@@ -95,6 +95,28 @@ export default function MemberList() {
     handleFilter()
   }, [handleFilter])
 
+  // 受講年月をフォーマットする関数を追加
+  const formatEnrollmentDate = (enrollmentDate: string | undefined) => {
+    if (!enrollmentDate) return "未設定";
+    
+    // YYYY年MM月形式から年と月を抽出
+    const match = enrollmentDate.match(/(\d{4})年(\d{2})月/);
+    if (!match) return enrollmentDate;
+    
+    const year = match[1];
+    const month = match[2];
+    return (
+      <>
+        <span className="inline-block bg-blue-100 text-blue-800 rounded-l-md px-2 py-0.5 text-xs font-medium">
+          {year}年
+        </span>
+        <span className="inline-block bg-green-100 text-green-800 rounded-r-md px-2 py-0.5 text-xs font-medium border-l border-white/20">
+          {month}月
+        </span>
+      </>
+    );
+  };
+
   return (
     <div className="space-y-4 p-4 md:space-y-6 md:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -249,9 +271,9 @@ export default function MemberList() {
                     <div>
                       <span className="text-muted-foreground">受講年月：</span>
                       <div className="mt-1">
-                        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                          {member.enrollmentDate || "未設定"}
-                        </span>
+                        <div className="inline-flex items-center">
+                          {formatEnrollmentDate(member.enrollmentDate)}
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -324,9 +346,9 @@ export default function MemberList() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center justify-center rounded-md bg-gray-100 px-2.5 py-0.5 text-xs font-medium min-w-[80px] text-center">
-                          {member.enrollmentDate || "未設定"}
-                        </span>
+                        <div className="inline-flex items-center">
+                          {formatEnrollmentDate(member.enrollmentDate)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-2 py-0.5 text-xs font-medium min-w-[80px] text-center">
