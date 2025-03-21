@@ -28,6 +28,7 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
     phone: "",
     number: "",
     email: "",
+    notes: "",
   })
 
   // 電話番号入力時に自動的にハイフンを挿入する関数
@@ -69,6 +70,7 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
           phone: member.phone || "",
           number: member.number || "",
           email: member.email || "",
+          notes: member.notes || "",
         })
         setPostalCode(member.postalCode || "")
         setPrefecture(member.prefecture || "")
@@ -178,6 +180,7 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
         address: cityAddress,
         streetAddress: street,
         number: formData.get("number") as string,
+        notes: formData.get("notes") as string,
       }
 
       await updateMember(id, member)
@@ -442,6 +445,20 @@ export default function EditMemberPage({ params }: { params: { id: string } }) {
                   value={streetAddress}
                   onChange={(e) => setStreetAddress(e.target.value)}
                   placeholder="例：1-1-1 マンション101"
+                  className="rounded-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes" className="text-sm font-medium">
+                  備考
+                </Label>
+                <Input
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="備考欄"
                   className="rounded-full"
                 />
               </div>

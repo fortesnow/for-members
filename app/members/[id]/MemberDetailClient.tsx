@@ -74,6 +74,7 @@ type Member = {
   }
   postalCode?: string
   email?: string
+  notes?: string
 }
 
 // 住所から郵便番号を取得する関数
@@ -399,6 +400,18 @@ export default function MemberDetailClient({ id }: { id: string }) {
                       </span>
                     )
                 }
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-gray-500">備考</dt>
+              <dd className="mt-2">
+                {member.notes ? (
+                  <span className="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium">
+                    {member.notes}
+                  </span>
+                ) : (
+                  <span className="text-gray-400">未登録</span>
+                )}
               </dd>
             </div>
             <div>
