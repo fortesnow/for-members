@@ -57,6 +57,22 @@ export default function MemberList() {
     }
 
     try {
+      // 認証状態を確認
+      if (!auth?.currentUser) {
+        console.error("User is not authenticated")
+        setIsLoading(false)
+        toast({
+          title: "認証エラー",
+          description: "ログインしていないか、認証の有効期限が切れています",
+          variant: "destructive",
+        })
+        router.push("/login")
+        return
+      }
+
+      // 認証トークンを更新（期限切れトークンによるエラーを防止）
+      await auth.currentUser.getIdToken(true)
+      
       // 同期的に一度データを取得
       const membersRef = collection(db, "members")
       const q = query(membersRef, orderBy("createdAt", "desc"))
@@ -89,14 +105,18 @@ export default function MemberList() {
       if (error instanceof FirebaseError && error.message.includes("permission")) {
         toast({
           title: "セキュリティルールエラー",
-          description: "Firestoreのセキュリティルールを確認してください",
+          description: "認証が有効でないか、アクセス権限がありません。もう一度ログインしてください。",
           variant: "destructive",
         })
+        // 再ログインを促す
+        setTimeout(() => {
+          router.push("/login")
+        }, 2000)
       }
     } finally {
       setIsLoading(false)
     }
-  }, [toast]);
+  }, [toast, router]);
 
   // 認証状態を監視して、データを取得
   useEffect(() => {
@@ -227,10 +247,11 @@ export default function MemberList() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全ての資格種別</SelectItem>
-                    <SelectItem value="ベビーマッサージマスター">ベビーマッサージマスター</SelectItem>
-                    <SelectItem value="ベビーヨガマスター">ベビーヨガマスター</SelectItem>
-                    <SelectItem value="ベビーマッサージインストラクター">ベビーマッサージインストラクター</SelectItem>
-                    <SelectItem value="ベビーヨガインストラクター">ベビーヨガインストラクター</SelectItem>
+                    <SelectItem value="ベビマ">ベビマ</SelectItem>
+                    <SelectItem value="ベビーヨガ">ベビーヨガ</SelectItem>
+                    <SelectItem value="ベビー発育">ベビー発育</SelectItem>
+                    <SelectItem value="インストラクター">インストラクター</SelectItem>
+                    <SelectItem value="マスター">マスター</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

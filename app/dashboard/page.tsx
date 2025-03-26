@@ -64,11 +64,15 @@ export default function DashboardPage() {
 
   // 許可された資格種別のみにフィルタリング
   const allowedQualifications = {
-    "ベビーマッサージマスター": qualificationCounts["ベビーマッサージマスター"] || 0,
-    "ベビーヨガマスター": qualificationCounts["ベビーヨガマスター"] || 0,
-    "ベビーマッサージインストラクター": qualificationCounts["ベビーマッサージインストラクター"] || 0,
-    "ベビーヨガインストラクター": qualificationCounts["ベビーヨガインストラクター"] || 0
+    "ベビマ": qualificationCounts["ベビマ"] || 0,
+    "ベビーヨガ": qualificationCounts["ベビーヨガ"] || 0,
+    "ベビー発育": qualificationCounts["ベビー発育"] || 0,
+    "インストラクター": qualificationCounts["インストラクター"] || 0,
+    "マスター": qualificationCounts["マスター"] || 0
   };
+
+  // 資格種別の合計カウント（重複あり）
+  const totalQualificationCount = Object.values(allowedQualifications).reduce((sum, count) => sum + count, 0);
 
   // 地域ごとの会員数を集計
   const regionCounts = members.reduce((acc, member) => {
@@ -126,6 +130,14 @@ export default function DashboardPage() {
               {Object.keys(allowedQualifications).length === 0 && (
                 <div className="text-sm text-muted-foreground italic">データがありません</div>
               )}
+              
+              <div className="border-t border-accent/20 pt-2 mt-3 flex justify-between items-center">
+                <span className="text-sm font-medium">累計資格数</span>
+                <span className="font-serif">{totalQualificationCount}<span className="text-xs ml-0.5">件</span></span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                ※重複を含む資格取得の総数
+              </div>
             </div>
           </CardContent>
         </Card>

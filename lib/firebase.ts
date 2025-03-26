@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app"
 import { getFirestore, Firestore, connectFirestoreEmulator } from "firebase/firestore"
-import { getAuth, Auth, connectAuthEmulator } from "firebase/auth"
+import { getAuth, Auth, connectAuthEmulator, setPersistence, browserLocalPersistence } from "firebase/auth"
 
 let app: FirebaseApp | undefined;
 let db: Firestore | undefined;
@@ -22,10 +22,21 @@ if (typeof window !== 'undefined') {
     db = getFirestore(app)
     auth = getAuth(app)
 
-    // エミュレータ接続を一時的に無効化
+    // 認証持続性の設定（ページリロード後も認証状態を維持）
+    if (auth) {
+      setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          console.log("Auth persistence set to LOCAL")
+        })
+        .catch(error => {
+          console.error("Error setting auth persistence:", error)
+        })
+    }
+
+    // エミュレータ接続（開発環境のみ）
     if (process.env.NODE_ENV === "development" && process.env.USE_EMULATOR === "true") {
-      connectAuthEmulator(auth, "http://localhost:9099")
-      connectFirestoreEmulator(db, 'localhost', 8080)
+      if (auth) connectAuthEmulator(auth, "http://localhost:9099")
+      if (db) connectFirestoreEmulator(db, 'localhost', 8080)
     }
     
     // デバッグログは開発環境でのみ表示

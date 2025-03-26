@@ -2,10 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /members/{memberId} {
-      // 一時的に認証なしでの書き込みを許可（開発環境用）
-      allow read, write: if true;
-      // 本番環境では以下のルールに戻すこと
-      // allow read, write: if request.auth != null;
+      // 認証済みのユーザーに読み書き権限を付与（本番環境用）
+      allow read, write: if request.auth != null;
+    }
+    // デフォルトルール（未指定のコレクションはすべて拒否）
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 } 
