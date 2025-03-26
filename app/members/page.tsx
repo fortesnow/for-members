@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Loader2 } from "lucide-react"
+import { Search, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -30,6 +30,9 @@ import type { Member } from "@/lib/db"
 import { formatCertificateNumber } from "@/lib/db"
 import { FirebaseError } from "firebase/app"
 
+// ページごとに表示する会員数
+const PAGE_SIZE = 20;
+
 export default function MemberList() {
   const [members, setMembers] = useState<Member[]>([])
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
@@ -37,8 +40,26 @@ export default function MemberList() {
   const [nameFilter, setNameFilter] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [prefectureFilter, setPrefectureFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [displayMode, setDisplayMode] = useState<"paged" | "all">("paged")
   const { toast } = useToast()
   const router = useRouter()
+
+  // ページネーションの計算
+  const totalPages = Math.ceil(filteredMembers.length / PAGE_SIZE);
+  
+  // 現在のページに表示するメンバーを取得
+  const getCurrentPageMembers = useCallback(() => {
+    if (displayMode === "all") {
+      return filteredMembers;
+    }
+    
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    return filteredMembers.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredMembers, currentPage, displayMode]);
+  
+  // 現在のページのメンバー
+  const displayedMembers = getCurrentPageMembers();
 
   // membersデータを取得する関数
   const fetchMembersData = useCallback(async () => {
@@ -94,6 +115,8 @@ export default function MemberList() {
       console.log(`Fetched ${memberData.length} members successfully`)
       setMembers(memberData)
       setFilteredMembers(memberData)
+      // ページを1ページ目に戻す
+      setCurrentPage(1)
     } catch (error) {
       console.error("Error fetching members:", error)
       toast({
@@ -175,13 +198,25 @@ export default function MemberList() {
         (prefectureFilter === "all" || member.prefecture === prefectureFilter),
     )
     setFilteredMembers(filtered)
+    // フィルタリングした後は1ページ目に戻す
+    setCurrentPage(1)
   }, [nameFilter, typeFilter, prefectureFilter, members])
 
   // フィルター条件が変更されたら自動的にフィルタリングを実行
-   
   useEffect(() => {
     handleFilter()
   }, [handleFilter])
+
+  // ページを変更する関数
+  const changePage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setCurrentPage(newPage);
+  };
+
+  // ディスプレイモードを切り替える関数
+  const toggleDisplayMode = () => {
+    setDisplayMode(prev => prev === "paged" ? "all" : "paged");
+  };
 
   // 受講年月をフォーマットする関数を追加
   const formatEnrollmentDate = (enrollmentDate: string | undefined) => {
@@ -207,6 +242,69 @@ export default function MemberList() {
       <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium whitespace-nowrap">
         {match[1]}年{match[2]}月
       </span>
+    );
+  };
+
+  // ページネーションコントロールをレンダリングする関数
+  const renderPagination = () => {
+    if (totalPages <= 1 || displayMode === "all") return null;
+
+    return (
+      <div className="flex items-center justify-center space-x-2 mt-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => changePage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="h-8 w-8 p-0"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="sr-only">前へ</span>
+        </Button>
+        
+        <div className="flex items-center">
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            // 現在のページが中央に来るように表示するページ番号を計算
+            let pageNum;
+            if (totalPages <= 5) {
+              // 全部で5ページ以下なら全部表示
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              // 現在のページが1-3なら1-5を表示
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              // 現在のページが後ろから3番目以内なら、末尾5ページを表示
+              pageNum = totalPages - 4 + i;
+            } else {
+              // それ以外なら現在のページの前後2ページずつ表示
+              pageNum = currentPage - 2 + i;
+            }
+
+            return (
+              <Button
+                key={pageNum}
+                variant={currentPage === pageNum ? "default" : "outline"}
+                size="sm"
+                onClick={() => changePage(pageNum)}
+                className={`h-8 w-8 p-0 ${currentPage === pageNum ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                {pageNum}
+              </Button>
+            );
+          })}
+        </div>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => changePage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="h-8 w-8 p-0"
+        >
+          <ChevronRight className="h-4 w-4" />
+          <span className="sr-only">次へ</span>
+        </Button>
+      </div>
     );
   };
 
@@ -310,11 +408,27 @@ export default function MemberList() {
                 <span className="text-gray-500 ml-auto">
                   検索結果: {filteredMembers.length}件
                 </span>
+                
+                {/* 表示モード切り替えボタン */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleDisplayMode}
+                  className="ml-2"
+                >
+                  {displayMode === "paged" ? "全て表示" : "ページ表示"}
+                </Button>
+                
+                {displayMode === "paged" && totalPages > 0 && (
+                  <span className="text-gray-500 ml-2">
+                    {currentPage} / {totalPages}ページ
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="mt-4 space-y-4 md:hidden">
-              {filteredMembers.map((member) => (
+              {displayedMembers.map((member) => (
                 <div
                   key={member.id}
                   className="rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
@@ -405,7 +519,7 @@ export default function MemberList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredMembers.map((member) => (
+                  {displayedMembers.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell>
                         <div>{member.name}</div>
@@ -464,6 +578,9 @@ export default function MemberList() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* ページネーションコントロール */}
+            {renderPagination()}
 
             <div className="flex justify-end mt-4">
               <PDFDownloadButton members={filteredMembers} />
