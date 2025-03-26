@@ -359,11 +359,11 @@ export default function EditMemberPage() {
                   <div className="flex items-center space-x-2 mb-2">
                     <input
                       type="checkbox"
-                      id="type-master-massage"
+                      id="type-bebima"
                       name="types"
-                      value="ベビーマッサージマスター"
+                      value="ベビマ"
                       className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      checked={formData.types.includes("ベビーマッサージマスター")}
+                      checked={formData.types.includes("ベビマ")}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData(prev => {
@@ -374,19 +374,19 @@ export default function EditMemberPage() {
                         });
                       }}
                     />
-                    <Label htmlFor="type-master-massage" className="text-sm">
-                      ベビーマッサージマスター
+                    <Label htmlFor="type-bebima" className="text-sm">
+                      ベビマ
                     </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2 mb-2">
                     <input
                       type="checkbox"
-                      id="type-master-yoga"
+                      id="type-bebee-yoga"
                       name="types"
-                      value="ベビーヨガマスター"
+                      value="ベビーヨガ"
                       className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      checked={formData.types.includes("ベビーヨガマスター")}
+                      checked={formData.types.includes("ベビーヨガ")}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData(prev => {
@@ -397,19 +397,19 @@ export default function EditMemberPage() {
                         });
                       }}
                     />
-                    <Label htmlFor="type-master-yoga" className="text-sm">
-                      ベビーヨガマスター
+                    <Label htmlFor="type-bebee-yoga" className="text-sm">
+                      ベビーヨガ
                     </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2 mb-2">
                     <input
                       type="checkbox"
-                      id="type-instructor-massage"
+                      id="type-bebee-hatsuiku"
                       name="types"
-                      value="ベビーマッサージインストラクター"
+                      value="ベビー発育"
                       className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      checked={formData.types.includes("ベビーマッサージインストラクター")}
+                      checked={formData.types.includes("ベビー発育")}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData(prev => {
@@ -420,19 +420,42 @@ export default function EditMemberPage() {
                         });
                       }}
                     />
-                    <Label htmlFor="type-instructor-massage" className="text-sm">
-                      ベビーマッサージインストラクター
+                    <Label htmlFor="type-bebee-hatsuiku" className="text-sm">
+                      ベビー発育
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id="type-instructor"
+                      name="types"
+                      value="インストラクター"
+                      className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      checked={formData.types.includes("インストラクター")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => {
+                          const types = e.target.checked 
+                            ? [...prev.types, value] 
+                            : prev.types.filter(t => t !== value);
+                          return { ...prev, types };
+                        });
+                      }}
+                    />
+                    <Label htmlFor="type-instructor" className="text-sm">
+                      インストラクター
                     </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      id="type-instructor-yoga"
+                      id="type-master"
                       name="types"
-                      value="ベビーヨガインストラクター"
+                      value="マスター"
                       className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      checked={formData.types.includes("ベビーヨガインストラクター")}
+                      checked={formData.types.includes("マスター")}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData(prev => {
@@ -443,8 +466,8 @@ export default function EditMemberPage() {
                         });
                       }}
                     />
-                    <Label htmlFor="type-instructor-yoga" className="text-sm">
-                      ベビーヨガインストラクター
+                    <Label htmlFor="type-master" className="text-sm">
+                      マスター
                     </Label>
                   </div>
                 </div>
