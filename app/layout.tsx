@@ -20,11 +20,11 @@ export default function RootLayout({
     <html lang="ja">
       <body className={inter.className}>
         {isLoginPage ? (
-          <main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+          <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">
             {children}
           </main>
         ) : (
-          <div className="flex h-screen bg-gray-100">
+          <div className="flex h-screen bg-amber-50">
             <Sidebar />
             <main className="flex-1 overflow-y-auto p-8">
               {children}
