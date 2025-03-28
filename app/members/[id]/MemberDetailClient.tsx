@@ -40,13 +40,13 @@ function AlertDialogSimple({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-2 text-amber-800">{title}</h2>
-        <p className="text-amber-700 mb-6">{description}</p>
+        <h2 className="text-xl font-semibold mb-2 text-primary">{title}</h2>
+        <p className="text-muted-foreground mb-6">{description}</p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} className="border-amber-300 text-amber-700 hover:bg-amber-50">
+          <Button variant="outline" onClick={onClose}>
             {cancelText}
           </Button>
-          <Button variant="destructive" onClick={onConfirm} className="bg-red-600 hover:bg-red-700">
+          <Button variant="destructive" onClick={onConfirm}>
             {confirmText}
           </Button>
         </div>
@@ -301,7 +301,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-amber-700" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -309,8 +309,8 @@ export default function MemberDetailClient({ id }: { id: string }) {
   if (!member) {
     return (
       <div className="p-4 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-amber-800">会員が見つかりません</h1>
-        <Button asChild className="bg-amber-700 hover:bg-amber-800">
+        <h1 className="text-2xl font-bold mb-4 text-primary">会員が見つかりません</h1>
+        <Button asChild>
           <Link href="/members">会員一覧に戻る</Link>
         </Button>
       </div>
@@ -320,15 +320,15 @@ export default function MemberDetailClient({ id }: { id: string }) {
   return (
     <div className="space-y-4 p-4 md:space-y-6 md:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold md:text-3xl text-amber-800">会員詳細</h1>
+        <h1 className="text-2xl font-bold md:text-3xl text-primary">会員詳細</h1>
         <div className="flex gap-2 sm:gap-4">
-          <Button className="flex-1 sm:flex-none bg-amber-700 hover:bg-amber-800" asChild>
+          <Button className="flex-1 sm:flex-none" asChild>
             <Link href={`/members/${id}/edit`}>編集</Link>
           </Button>
           
           <Button 
             variant="destructive" 
-            className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700" 
+            className="flex-1 sm:flex-none" 
             disabled={isDeleting}
             onClick={() => setShowDeleteDialog(true)}
           >
@@ -357,44 +357,44 @@ export default function MemberDetailClient({ id }: { id: string }) {
         </div>
       </div>
 
-      <Card>
+      <Card className="border-accent/40 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl md:text-2xl text-amber-800">{member.name}</CardTitle>
-          <p className="text-md text-amber-600">{member.furigana}</p>
+          <CardTitle className="text-xl md:text-2xl text-primary">{member.name}</CardTitle>
+          <p className="text-md text-muted-foreground">{member.furigana}</p>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 sm:grid-cols-2">
             <div>
-              <dt className="font-medium text-amber-700">連絡先</dt>
+              <dt className="font-medium text-muted-foreground">連絡先</dt>
               <dd className="mt-2 overflow-x-auto">
-                <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap text-amber-800">
+                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap">
                   {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">メールアドレス</dt>
+              <dt className="font-medium text-muted-foreground">メールアドレス</dt>
               <dd className="mt-2 overflow-x-auto">
-                <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap text-amber-800">
+                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap">
                   {member.email || "未登録"}
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">会員種別</dt>
+              <dt className="font-medium text-muted-foreground">会員種別</dt>
               <dd className="flex flex-wrap gap-2 mt-2">
                 {member.types?.length 
                   ? member.types.map((type) => (
                       <span 
                         key={type} 
-                        className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-medium border border-amber-200 shadow-sm text-amber-800"
+                        className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-sm font-medium border border-accent/20 shadow-sm"
                       >
                         {type}
                       </span>
                     ))
                   : (
                       <span 
-                        className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-medium border border-amber-200 shadow-sm text-amber-800"
+                        className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-sm font-medium border border-accent/20 shadow-sm"
                       >
                         {member.type}
                       </span>
@@ -403,38 +403,38 @@ export default function MemberDetailClient({ id }: { id: string }) {
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">備考</dt>
+              <dt className="font-medium text-muted-foreground">備考</dt>
               <dd className="mt-2">
                 {member.notes ? (
-                  <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
                     {member.notes}
                   </span>
                 ) : (
-                  <span className="text-amber-400">未登録</span>
+                  <span className="text-muted-foreground">未登録</span>
                 )}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">認定証番号</dt>
+              <dt className="font-medium text-muted-foreground">認定証番号</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center justify-center rounded-md bg-amber-100 px-3 py-1 text-sm font-medium min-w-[100px] text-center text-amber-800">
+                <span className="inline-flex items-center justify-center rounded-md bg-secondary px-3 py-1 text-sm font-medium min-w-[100px] text-center">
                   {formatCertificateNumber(member.number)}
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">都道府県</dt>
+              <dt className="font-medium text-muted-foreground">都道府県</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center justify-center rounded-md bg-amber-100 px-3 py-1 text-sm font-medium min-w-[100px] text-center text-amber-800">
+                <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium min-w-[100px] text-center">
                   {member.prefecture}
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-amber-700">郵便番号</dt>
+              <dt className="font-medium text-muted-foreground">郵便番号</dt>
               <dd className="mt-2">
                 {member.postalCode ? (
-                  <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
                     〒{member.postalCode}
                   </span>
                 ) : member.address ? (
@@ -443,7 +443,6 @@ export default function MemberDetailClient({ id }: { id: string }) {
                     size="sm" 
                     onClick={updatePostalCode}
                     disabled={isUpdatingPostalCode}
-                    className="text-amber-700 border-amber-300 hover:bg-amber-50"
                   >
                     {isUpdatingPostalCode ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-1" />
@@ -453,35 +452,35 @@ export default function MemberDetailClient({ id }: { id: string }) {
                     郵便番号を取得
                   </Button>
                 ) : (
-                  <span className="text-amber-400">未登録</span>
+                  <span className="text-muted-foreground">未登録</span>
                 )}
               </dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="font-medium text-amber-700">住所</dt>
+              <dt className="font-medium text-muted-foreground">住所</dt>
               <dd className="mt-2">
                 {member.prefecture || member.address || member.streetAddress ? (
                   <div className="flex flex-wrap gap-1 items-center">
                     {member.prefecture && (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
                         {member.prefecture}
                       </span>
                     )}
                     {member.address && (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
                         {member.address.startsWith(member.prefecture) 
                           ? member.address.substring(member.prefecture.length) 
                           : member.address}
                       </span>
                     )}
                     {member.streetAddress && !member.address?.includes(member.streetAddress) && (
-                      <span className="inline-flex items-center rounded-md bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
                         {member.streetAddress}
                       </span>
                     )}
                   </div>
                 ) : (
-                  <span className="text-amber-400">未登録</span>
+                  <span className="text-muted-foreground">未登録</span>
                 )}
               </dd>
             </div>
@@ -490,11 +489,11 @@ export default function MemberDetailClient({ id }: { id: string }) {
       </Card>
 
       {/* 講師設定セクション */}
-      <Card>
-        <CardHeader className="bg-amber-50">
+      <Card className="border-accent/40 shadow-sm">
+        <CardHeader className="bg-accent/20">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-amber-800 text-lg flex items-center">
-              <BookOpen className="h-5 w-5 mr-2 text-amber-700" />
+            <CardTitle className="text-primary text-lg flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-primary/80" />
               講師設定
             </CardTitle>
             <div className="flex items-center space-x-2">
@@ -503,7 +502,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
                 checked={isInstructor}
                 onCheckedChange={handleInstructorToggle}
               />
-              <Label htmlFor="instructor-mode" className="text-amber-700">
+              <Label htmlFor="instructor-mode" className="text-muted-foreground">
                 {isInstructor ? "講師" : "一般会員"}
               </Label>
             </div>
@@ -513,44 +512,41 @@ export default function MemberDetailClient({ id }: { id: string }) {
         {isInstructor && (
           <CardContent className="pt-6 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="specialties" className="text-amber-700">専門分野（カンマ区切りで複数入力可）</Label>
+              <Label htmlFor="specialties" className="text-muted-foreground">専門分野（カンマ区切りで複数入力可）</Label>
               <Input
                 id="specialties"
                 placeholder="マッサージ, 整体, リラクゼーション"
                 value={specialties}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSpecialties(e.target.value)}
-                className="border-amber-200 focus-visible:ring-amber-400"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="experience" className="text-amber-700">経験年数</Label>
+              <Label htmlFor="experience" className="text-muted-foreground">経験年数</Label>
               <Input
                 id="experience"
                 type="number"
                 placeholder="5"
                 value={experience}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExperience(e.target.value)}
-                className="border-amber-200 focus-visible:ring-amber-400"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-amber-700">自己紹介・経歴</Label>
+              <Label htmlFor="bio" className="text-muted-foreground">自己紹介・経歴</Label>
               <Textarea
                 id="bio"
                 placeholder="経歴や得意分野、資格などを入力してください"
                 value={bio}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setBio(e.target.value)}
                 rows={4}
-                className="border-amber-200 focus-visible:ring-amber-400"
               />
             </div>
             
             <Button 
               onClick={saveInstructorDetails} 
               disabled={isSaving}
-              className="w-full sm:w-auto bg-amber-700 hover:bg-amber-800"
+              className="w-full sm:w-auto"
             >
               {isSaving ? (
                 <>
