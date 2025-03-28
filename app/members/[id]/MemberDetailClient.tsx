@@ -367,7 +367,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-muted-foreground">連絡先</dt>
               <dd className="mt-2 overflow-x-auto">
-                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap">
+                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap text-foreground">
                   {member.phone ? member.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : member.phone}
                 </span>
               </dd>
@@ -375,7 +375,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-muted-foreground">メールアドレス</dt>
               <dd className="mt-2 overflow-x-auto">
-                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap">
+                <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium tracking-wider whitespace-nowrap text-foreground">
                   {member.email || "未登録"}
                 </span>
               </dd>
@@ -387,14 +387,14 @@ export default function MemberDetailClient({ id }: { id: string }) {
                   ? member.types.map((type) => (
                       <span 
                         key={type} 
-                        className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-sm font-medium border border-accent/20 shadow-sm"
+                        className="inline-flex items-center rounded-full bg-accent/50 px-3 py-1 text-sm font-medium text-foreground border border-accent/20 shadow-sm"
                       >
                         {type}
                       </span>
                     ))
                   : (
                       <span 
-                        className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-sm font-medium border border-accent/20 shadow-sm"
+                        className="inline-flex items-center rounded-full bg-accent/50 px-3 py-1 text-sm font-medium text-foreground border border-accent/20 shadow-sm"
                       >
                         {member.type}
                       </span>
@@ -406,7 +406,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
               <dt className="font-medium text-muted-foreground">備考</dt>
               <dd className="mt-2">
                 {member.notes ? (
-                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-foreground">
                     {member.notes}
                   </span>
                 ) : (
@@ -417,7 +417,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-muted-foreground">認定証番号</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center justify-center rounded-md bg-secondary px-3 py-1 text-sm font-medium min-w-[100px] text-center">
+                <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium min-w-[100px] text-center text-foreground">
                   {formatCertificateNumber(member.number)}
                 </span>
               </dd>
@@ -425,7 +425,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
             <div>
               <dt className="font-medium text-muted-foreground">都道府県</dt>
               <dd className="mt-2">
-                <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium min-w-[100px] text-center">
+                <span className="inline-flex items-center justify-center rounded-md bg-accent/50 px-3 py-1 text-sm font-medium min-w-[100px] text-center text-foreground">
                   {member.prefecture}
                 </span>
               </dd>
@@ -434,7 +434,7 @@ export default function MemberDetailClient({ id }: { id: string }) {
               <dt className="font-medium text-muted-foreground">郵便番号</dt>
               <dd className="mt-2">
                 {member.postalCode ? (
-                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-foreground">
                     〒{member.postalCode}
                   </span>
                 ) : member.address ? (
@@ -462,19 +462,19 @@ export default function MemberDetailClient({ id }: { id: string }) {
                 {member.prefecture || member.address || member.streetAddress ? (
                   <div className="flex flex-wrap gap-1 items-center">
                     {member.prefecture && (
-                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-foreground">
                         {member.prefecture}
                       </span>
                     )}
                     {member.address && (
-                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-foreground">
                         {member.address.startsWith(member.prefecture) 
                           ? member.address.substring(member.prefecture.length) 
                           : member.address}
                       </span>
                     )}
                     {member.streetAddress && !member.address?.includes(member.streetAddress) && (
-                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-foreground">
                         {member.streetAddress}
                       </span>
                     )}
